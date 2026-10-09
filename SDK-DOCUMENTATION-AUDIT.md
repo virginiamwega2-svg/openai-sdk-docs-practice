@@ -84,6 +84,20 @@ The process exited with status code `1`, indicating failure. No API request was 
 
 **Assessment:** Preserve this useful guidance when creating beginner onboarding materials.
 
+## Finding 5: Node.js Version Compatibility
+
+**Observation:** The practice environment uses Node.js `v25.8.0` and npm `11.11.0`.
+
+**Documentation check:** The QuickStart directs readers to the official OpenAI Node.js SDK README for the currently supported Node.js versions.
+
+**Potential developer impact:** Developers using a runtime outside the SDK's documented support range may encounter compatibility issues or use an environment that is not officially supported.
+
+**Assessment:** The local Node.js version is not listed in the supported runtime versions previously reviewed. This does not prove that the example fails, but compatibility should not be assumed.
+
+**Recommended improvement:** Keep the QuickStart linked to the official runtime requirements and verify the example using a currently supported Node.js LTS version before claiming the setup is fully verified.
+
+**Verification status:** The installed versions have been recorded. A successful API request and compatibility test on a supported runtime remain outstanding.
+
 ## Remaining Verification
 
 The following work is still outstanding:
