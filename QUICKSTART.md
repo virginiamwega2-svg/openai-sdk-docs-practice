@@ -176,8 +176,11 @@ Check that:
 
 * The `.env` file is in the project root.
 * The variable is named `OPENAI_API_KEY`.
-* You replaced the placeholder with a valid key.
-* `.env` is not being confused with another file such as `.env.txt`.
+* You have replaced the placeholder with a valid API key.
+* The file is named `.env`, not `.env.txt`.
+* The `.env` file is not committed to Git.
+
+The application checks for a missing or placeholder key before sending a request.
 
 ### `npm start` does not work
 
@@ -188,13 +191,49 @@ Check that:
 * `package.json` contains `"start": "node index.js"` inside its `scripts` object.
 * Node.js and npm are installed.
 
-### The API request fails
+### Authentication error
 
-Check your API key, network connection, model access, and the error message returned by the SDK. Confirm that your account has the necessary API access and billing setup.
+The API key may be invalid, expired, or revoked.
 
-### The code uses an unsupported Node.js version
+* Check that the key is correct and active.
+* Confirm that the key is loaded from your `.env` file.
+* Make sure you have not accidentally added extra spaces.
 
-Check the official [OpenAI Node.js SDK README](https://github.com/openai/openai-node) for the currently supported Node.js versions.
+### Permission error
+
+Check whether your API key, project, and account have the permissions required for the request.
+
+### Rate limit or quota error
+
+A rate-limit error can indicate that requests are arriving too quickly or that a usage or billing limit has been reached.
+
+* Check the error details to identify the cause.
+* Reduce request frequency if you are exceeding a rate limit.
+* Check your API usage and billing settings if the error indicates a quota or spending limit.
+
+### Connection error
+
+Check your internet connection, network or proxy configuration, and firewall settings. If the problem persists, try again later.
+
+### The API request fails for another reason
+
+Check the error category and your request configuration. Confirm that the requested model is available to your project and that the request uses the expected parameters.
+
+### Unsupported Node.js version
+
+Check the official [OpenAI Node.js SDK README](https://github.com/openai/openai-node) for supported Node.js versions.
+
+### Automated tests
+
+Run:
+
+```bash
+npm test
+```
+
+The tests verify the missing-key behavior and the error-message handling for authentication, permission, rate-limit, connection, and unknown errors. They run locally without making a paid API request.
+
+Passing these tests does not verify that a real API request succeeds.
 
 ## 9. What success looks like
 

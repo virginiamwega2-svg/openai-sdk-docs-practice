@@ -1,5 +1,7 @@
 
 import "dotenv/config";
+import OpenAI from "openai";
+import { getErrorMessage } from "./error-handler.js";
 
 async function main() {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -12,7 +14,6 @@ async function main() {
     return;
   }
 
-  const { default: OpenAI } = await import("openai");
   const client = new OpenAI({ apiKey });
 
   const response = await client.responses.create({
@@ -22,9 +23,7 @@ async function main() {
 
   console.log(response.output_text);
 }
-
 main().catch((error) => {
-  console.error("The request failed. Check your API key, model access, and network connection.");
-  console.error(error.message);
+  console.error(getErrorMessage(error));
   process.exitCode = 1;
 });
