@@ -17,6 +17,10 @@ A hands-on project exploring the developer experience of using the OpenAI JavaSc
 * Node.js and npm installed.
 * A code editor such as VS Code.
 
+**Note:** You do not need a real OpenAI API key to install the dependencies or run the local tests. A valid API key is required only if you want to make a live API request.
+
+
+
 ### 1. Install dependencies
 
 ```bash
