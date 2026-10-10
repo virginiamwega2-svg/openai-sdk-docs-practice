@@ -2,7 +2,7 @@
 
 This guide shows you how to set up the OpenAI Node.js SDK, protect your API key, run a simple example, and troubleshoot common errors.
 
-The example includes local error handling and automated tests. You do not need a real  API key to run the tests.
+The example includes local error handling and automated tests. You do not need a real API key to run the tests.
 
 ## Choose your path
 
@@ -11,15 +11,13 @@ This guide supports two ways to get started:
 * **Use the existing project:** If you cloned this repository, continue to the prerequisites, install the dependencies with `npm install`, and follow the sections on running the example and automated tests. The project files and configuration are already included.
 * **Build from scratch:** If you want to create the example yourself, follow the project creation, dependency installation, configuration, and code sections in order.
 
-You do not need a real API key to run the local automated tests or verify the missing-key behavior.
-
 ## Prerequisites
 
 Before you begin, make sure you have:
 
 * [Node.js](https://nodejs.org/) installed. Check the [OpenAI Node.js SDK README](https://github.com/openai/openai-node) for supported versions.
 * npm installed.
-* An OpenAI API key if you want to make a real API request.
+* An OpenAI API key if you want to make a live API request.
 
 Check your installed versions:
 
@@ -27,6 +25,8 @@ Check your installed versions:
 node --version
 npm --version
 ```
+
+**Note:** You do not need a real OpenAI API key to install the dependencies or run the local tests. A valid API key is required only if you want to make a live API request.
 
 ## 1. Create a project
 
@@ -48,14 +48,13 @@ Install the OpenAI SDK and `dotenv`, which loads environment variables from a `.
 npm install openai dotenv
 ```
 
-The practice project also uses Node.js's built-in test runner, so no separate test framework is needed. The tests use the `openai` package to check how common SDK errors are handled.
-
+The practice project uses Node.js's built-in test runner, so no separate test framework is needed.
 
 ## 3. Configure your project
 
 Open `package.json`.
 
-Make sure it includes:
+Make sure it includes the following property at the top level:
 
 ```json
 "type": "module"
@@ -67,7 +66,7 @@ Inside the existing `scripts` object, add:
 "start": "node index.js"
 ```
 
-Keep any existing scripts and dependencies.
+Keep any existing scripts and dependencies. Ensure the JSON syntax remains valid, including commas between properties.
 
 The `"type": "module"` setting allows the project to use JavaScript's `import` syntax.
 
@@ -79,7 +78,7 @@ Create a file named `.env` in the project root:
 OPENAI_API_KEY=your_api_key_here
 ```
 
-The placeholder is not a real API key. Replace it with a valid key only when you are ready to make a real API request.
+The placeholder is not a real API key. Replace it with a valid key only when you are ready to make a live API request.
 
 Create a `.gitignore` file in the project root:
 
@@ -165,13 +164,13 @@ Missing API key. Add a valid OPENAI_API_KEY to your .env file.
 
 It stops before sending an API request and sets the exit code to `1`.
 
-We have verified this behavior in the practice project.
+This missing-key behavior has been verified in the practice project.
 
 ### If you have a valid API key
 
 With a valid API key, the necessary permissions, and access to the configured model, the program should send a request and print the generated greeting.
 
-The successful live request has not been verified in this project.
+A successful live request has not been verified in this project.
 
 **Note:** Real API requests may incur charges. Check your API access and billing before making one.
 
@@ -194,9 +193,9 @@ The tests cover:
 5. Connection errors.
 6. Unknown errors.
 
-The tests run locally without making a real or paid API request.
+The tests run locally without making a live or paid API request.
 
-A successful run should report:
+A successful run should report results equivalent to:
 
 ```text
 ℹ tests 6
@@ -214,7 +213,7 @@ Check that:
 
 * `.env` is in the project root.
 * The variable is named `OPENAI_API_KEY`.
-* You have replaced the placeholder with a valid key when making a real request.
+* You have replaced the placeholder with a valid key when making a live request.
 * The file is named `.env`, not `.env.txt`.
 * `.env` is not committed to Git.
 
@@ -269,7 +268,7 @@ Run:
 npm test
 ```
 
-Read the failing test's error message and compare it with the expected behavior. The tests are designed to check local error handling; they do not require a real API key.
+Read the failing test's error message and compare it with the expected behavior. The tests check local error handling and do not require a real API key.
 
 ## 9. What success looks like
 
@@ -278,7 +277,7 @@ You have completed the setup when you can:
 * Install the required dependencies.
 * Configure an API key without exposing it.
 * Run `npm start`.
-* Understand the difference between a missing-key check and a real API request.
+* Understand the difference between a missing-key check and a live API request.
 * Run the six automated tests successfully.
 * Find guidance for common errors without guessing what to do next.
 
