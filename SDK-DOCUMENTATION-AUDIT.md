@@ -126,3 +126,15 @@ Perform a repeatable first-time-user test of `QUICKSTART.md`, compare each instr
 * [OpenAI Node.js SDK repository](https://github.com/openai/openai-node)
 * [OpenAI API Quickstart](https://developers.openai.com/api/docs/quickstart)
 * [OpenAI Node.js SDK authentication guide](https://github.com/openai/openai-node/blob/main/docs/authentication.md)
+
+## Finding 6: Automated Test for Missing API Key
+
+**Observation:** The project initially used npm's default placeholder test script, which did not run actual tests.
+
+**Improvement:** Configured `npm test` to use Node.js's built-in test runner and added `index.test.js`.
+
+**Verification:** Ran `npm test` successfully. The test confirmed that the application exits with status code `1` and displays the expected missing-API-key message when the placeholder key is used.
+
+**Developer impact:** Developers can verify the missing-key failure path without making an API request or needing a paid API key.
+
+**Verification status:** 1 automated test passing. A successful SDK request and compatibility testing on a supported Node.js runtime remain outstanding.
