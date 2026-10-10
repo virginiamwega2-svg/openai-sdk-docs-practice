@@ -2,7 +2,16 @@
 
 This guide shows you how to set up the OpenAI Node.js SDK, protect your API key, run a simple example, and troubleshoot common errors.
 
-The example includes local error handling and automated tests. You do not need a real API key to run the tests.
+The example includes local error handling and automated tests. You do not need a real  API key to run the tests.
+
+## Choose your path
+
+This guide supports two ways to get started:
+
+* **Use the existing project:** If you cloned this repository, continue to the prerequisites, install the dependencies with `npm install`, and follow the sections on running the example and automated tests. The project files and configuration are already included.
+* **Build from scratch:** If you want to create the example yourself, follow the project creation, dependency installation, configuration, and code sections in order.
+
+You do not need a real API key to run the local automated tests or verify the missing-key behavior.
 
 ## Prerequisites
 
