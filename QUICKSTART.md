@@ -1,14 +1,16 @@
-# OpenAI Node.js SDK QuickStart
+# OpenAI Node.js SDK Quickstart
 
-This guide walks you through setting up the OpenAI Node.js SDK, configuring your API key securely, and running your first request.
+This guide shows you how to set up the OpenAI Node.js SDK, protect your API key, run a simple example, and troubleshoot common errors.
+
+The example includes local error handling and automated tests. You do not need a real API key to run the tests.
 
 ## Prerequisites
 
 Before you begin, make sure you have:
 
-* [Node.js](https://nodejs.org/) installed. Use a supported Node.js version listed in the [OpenAI Node.js SDK README](https://github.com/openai/openai-node).
+* [Node.js](https://nodejs.org/) installed. Check the [OpenAI Node.js SDK README](https://github.com/openai/openai-node) for supported versions.
 * npm installed.
-* An OpenAI API key for making real API requests.
+* An OpenAI API key if you want to make a real API request.
 
 Check your installed versions:
 
@@ -19,7 +21,7 @@ npm --version
 
 ## 1. Create a project
 
-Create a new folder for your project, open it in your terminal, and initialize it:
+Create a project folder and initialize it:
 
 ```bash
 mkdir openai-sdk-docs-practice
@@ -27,33 +29,38 @@ cd openai-sdk-docs-practice
 npm init -y
 ```
 
-If you already have a project folder, navigate into it instead of creating another one.
+If you already have this project, open its existing folder instead of creating another one.
 
 ## 2. Install the dependencies
 
-Install the OpenAI SDK and the package used to load environment variables:
+Install the OpenAI SDK and `dotenv`, which loads environment variables from a `.env` file:
 
 ```bash
 npm install openai dotenv
 ```
 
+The practice project also uses Node.js's built-in test runner, so no separate test framework is needed. The tests use the `openai` package to check how common SDK errors are handled.
+
+
 ## 3. Configure your project
 
-Open `package.json` and ensure it includes:
+Open `package.json`.
+
+Make sure it includes:
 
 ```json
 "type": "module"
 ```
 
-Inside the existing `scripts` object, add the following entry:
+Inside the existing `scripts` object, add:
 
 ```json
 "start": "node index.js"
 ```
 
-Keep any other existing scripts and dependencies.
+Keep any existing scripts and dependencies.
 
-Your project will use ES modules, which support the `import` syntax used in this guide.
+The `"type": "module"` setting allows the project to use JavaScript's `import` syntax.
 
 ## 4. Configure your API key securely
 
@@ -63,22 +70,22 @@ Create a file named `.env` in the project root:
 OPENAI_API_KEY=your_api_key_here
 ```
 
-Replace `your_api_key_here` with your actual API key when you are ready to make a real request.
+The placeholder is not a real API key. Replace it with a valid key only when you are ready to make a real API request.
 
-**Security rules:**
-
-* Never share your API key in public repositories, screenshots, or messages.
-* Never expose secret API keys in browser-side code.
-* Do not commit your `.env` file to Git.
-
-Create a `.gitignore` file in the project root containing:
+Create a `.gitignore` file in the project root:
 
 ```text
 .env
 node_modules/
 ```
 
-## 5. Create the first SDK example
+**Keep your API key private.**
+
+* Never commit your `.env` file to Git.
+* Never publish your API key in screenshots, messages, or public repositories.
+* Never expose a secret API key in browser-side code.
+
+## 5. Create the SDK example
 
 Create a file named `index.js` in the project root.
 
@@ -86,6 +93,10 @@ Add the following code:
 
 ```javascript
 import "dotenv/config";
+
+import OpenAI from "openai";
+
+import { getErrorMessage } from "./error-handler.js";
 
 async function main() {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -98,7 +109,6 @@ async function main() {
     return;
   }
 
-  const { default: OpenAI } = await import("openai");
   const client = new OpenAI({ apiKey });
 
   const response = await client.responses.create({
@@ -110,51 +120,55 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(
-    "The request failed. Check your API key, model access, and network connection."
-  );
-  console.error(error.message);
+  console.error(getErrorMessage(error));
   process.exitCode = 1;
 });
 ```
 
+This example uses `error-handler.js` to turn common API errors into more helpful messages. Make sure that file is present in your project.
+
 ### How the example works
 
-* `import "dotenv/config"` loads environment variables from `.env`.
-* The API-key check prevents the example from sending a request when the key is missing or still uses the placeholder.
-* The OpenAI client provides methods for interacting with the API.
+* `import "dotenv/config"` loads the variables stored in `.env`.
+* The API-key check stops the program if the key is missing or still contains the placeholder.
+* `new OpenAI({ apiKey })` creates an SDK client using the key.
 * `client.responses.create()` sends a request to the Responses API.
-* `response.output_text` retrieves the generated text.
-* The error handler reports a failed request and sets a non-zero exit code.
+* `model` specifies the model requested.
+* `input` contains the message sent to the model.
+* `response.output_text` provides the generated text.
+* The error handler displays a useful message if the request fails and sets a non-zero exit code.
 
 ## 6. Run the example
 
-In your project terminal, execute:
+In your terminal, run:
 
 ```bash
 npm start
 ```
 
-### Expected behavior without a real API key
+### If you have not configured a real API key
 
-If the key is missing or still uses the placeholder, the example prints:
+The program should display:
 
 ```text
 Missing API key. Add a valid OPENAI_API_KEY to your .env file.
 ```
 
-It stops before making an API request and exits with status code `1`.
+It stops before sending an API request and sets the exit code to `1`.
 
-We verified this behavior in the practice project.
+We have verified this behavior in the practice project.
 
-### Expected behavior with a valid API key
+### If you have a valid API key
 
-With a valid API key and access to the configured model, the example should send a request and print a friendly one-sentence greeting.
+With a valid API key, the necessary permissions, and access to the configured model, the program should send a request and print the generated greeting.
 
-API usage may incur charges. Check your account's API access and billing before making a real request.
+The successful live request has not been verified in this project.
+
+**Note:** Real API requests may incur charges. Check your API access and billing before making one.
+
 ## 7. Run the automated tests
 
-You can verify the missing-API-key behavior without making an API request or needing a real API key.
+The project includes local tests for the missing-key check and common error messages.
 
 Run:
 
@@ -162,11 +176,26 @@ Run:
 npm test
 ```
 
-The test checks that the application exits with status code `1` and displays a helpful error message when the API key is missing or still uses the placeholder.
+The tests cover:
 
-A successful test run should report **1 passing test and 0 failures**.
+1. Missing or placeholder API key.
+2. Authentication errors.
+3. Permission errors.
+4. Rate-limit errors.
+5. Connection errors.
+6. Unknown errors.
 
-**Note:** This test verifies the missing-key error path. It does not verify a successful API request.
+The tests run locally without making a real or paid API request.
+
+A successful run should report:
+
+```text
+ℹ tests 6
+ℹ pass 6
+ℹ fail 0
+```
+
+Passing these tests confirms that the tested local error-handling behavior works. It does not confirm that a live API request succeeds.
 
 ## 8. Troubleshooting
 
@@ -174,13 +203,13 @@ A successful test run should report **1 passing test and 0 failures**.
 
 Check that:
 
-* The `.env` file is in the project root.
+* `.env` is in the project root.
 * The variable is named `OPENAI_API_KEY`.
-* You have replaced the placeholder with a valid API key.
+* You have replaced the placeholder with a valid key when making a real request.
 * The file is named `.env`, not `.env.txt`.
-* The `.env` file is not committed to Git.
+* `.env` is not committed to Git.
 
-The application checks for a missing or placeholder key before sending a request.
+The program checks for a missing or placeholder key before sending a request.
 
 ### `npm start` does not work
 
@@ -188,42 +217,42 @@ Check that:
 
 * You are in the correct project folder.
 * `index.js` exists in the project root.
-* `package.json` contains `"start": "node index.js"` inside its `scripts` object.
+* `package.json` contains `"start": "node index.js"` inside `scripts`.
 * Node.js and npm are installed.
 
 ### Authentication error
 
-The API key may be invalid, expired, or revoked.
+Your API key may be invalid, expired, or revoked.
 
 * Check that the key is correct and active.
-* Confirm that the key is loaded from your `.env` file.
-* Make sure you have not accidentally added extra spaces.
+* Confirm that the application loads the key from `.env`.
+* Make sure the key has not been copied incorrectly.
 
 ### Permission error
 
-Check whether your API key, project, and account have the permissions required for the request.
+Check whether your API key and project have permission to make the requested API call. Also confirm that the model is available to your project.
 
-### Rate limit or quota error
+### Rate-limit or quota error
 
-A rate-limit error can indicate that requests are arriving too quickly or that a usage or billing limit has been reached.
+This error may mean that requests are arriving too quickly or that a usage limit has been reached.
 
-* Check the error details to identify the cause.
-* Reduce request frequency if you are exceeding a rate limit.
-* Check your API usage and billing settings if the error indicates a quota or spending limit.
+* Check the error details.
+* Reduce request frequency if you are hitting a rate limit.
+* Review usage and billing settings if the error indicates a quota or spending limit.
 
 ### Connection error
 
-Check your internet connection, network or proxy configuration, and firewall settings. If the problem persists, try again later.
+Check your internet connection, network or proxy settings, and firewall configuration. If the issue persists, try again later.
 
-### The API request fails for another reason
+### Another API request error
 
-Check the error category and your request configuration. Confirm that the requested model is available to your project and that the request uses the expected parameters.
+Check the error message and request configuration. Confirm that the model is available to your project and that the request uses supported parameters.
 
 ### Unsupported Node.js version
 
-Check the official [OpenAI Node.js SDK README](https://github.com/openai/openai-node) for supported Node.js versions.
+Check the [OpenAI Node.js SDK README](https://github.com/openai/openai-node) for the currently supported Node.js versions.
 
-### Automated tests
+### Automated tests fail
 
 Run:
 
@@ -231,19 +260,20 @@ Run:
 npm test
 ```
 
-The tests verify the missing-key behavior and the error-message handling for authentication, permission, rate-limit, connection, and unknown errors. They run locally without making a paid API request.
-
-Passing these tests does not verify that a real API request succeeds.
+Read the failing test's error message and compare it with the expected behavior. The tests are designed to check local error handling; they do not require a real API key.
 
 ## 9. What success looks like
 
-You have completed the QuickStart when you can:
+You have completed the setup when you can:
 
-* Install the SDK and its required dependencies.
-* Configure your API key without exposing it.
+* Install the required dependencies.
+* Configure an API key without exposing it.
 * Run `npm start`.
-* Receive a response from the API when valid credentials and model access are available.
-* Understand what to check when the example fails.
+* Understand the difference between a missing-key check and a real API request.
+* Run the six automated tests successfully.
+* Find guidance for common errors without guessing what to do next.
+
+A successful live API request requires valid credentials, suitable permissions, and access to the configured model. It has not been verified as part of this practice project.
 
 ## Official references
 
