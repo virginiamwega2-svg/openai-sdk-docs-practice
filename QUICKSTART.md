@@ -152,8 +152,23 @@ We verified this behavior in the practice project.
 With a valid API key and access to the configured model, the example should send a request and print a friendly one-sentence greeting.
 
 API usage may incur charges. Check your account's API access and billing before making a real request.
+## 7. Run the automated tests
 
-## 7. Troubleshooting
+You can verify the missing-API-key behavior without making an API request or needing a real API key.
+
+Run:
+
+```bash
+npm test
+```
+
+The test checks that the application exits with status code `1` and displays a helpful error message when the API key is missing or still uses the placeholder.
+
+A successful test run should report **1 passing test and 0 failures**.
+
+**Note:** This test verifies the missing-key error path. It does not verify a successful API request.
+
+## 8. Troubleshooting
 
 ### Missing API key
 
@@ -181,7 +196,7 @@ Check your API key, network connection, model access, and the error message retu
 
 Check the official [OpenAI Node.js SDK README](https://github.com/openai/openai-node) for the currently supported Node.js versions.
 
-## 8. What success looks like
+## 9. What success looks like
 
 You have completed the QuickStart when you can:
 
