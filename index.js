@@ -5,9 +5,11 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { getErrorMessage } from "./error-handler.js";
 
+const MODEL = "gpt-5.5";
+
 export async function generateGreeting(client) {
   const response = await client.responses.create({
-    model: "gpt-5.5",
+    model: MODEL,
     input: "Write a friendly one-sentence greeting.",
   });
 
@@ -20,7 +22,7 @@ export async function summarizeText(client, text) {
   }
 
   const response = await client.responses.create({
-    model: "gpt-5.5",
+    model: MODEL,
     input: `Summarize the following text clearly and concisely:\n\n${text}`,
   });
 
@@ -28,6 +30,24 @@ export async function summarizeText(client, text) {
 }
 
 async function main() {
+  const [command = "greet", ...args] = process.argv.slice(2);
+
+  if (command !== "greet" && command !== "summarize") {
+    console.error('Unknown command. Use "greet" or "summarize".');
+    process.exitCode = 1;
+    return;
+  }
+
+  const text = args.join(" ").trim();
+
+  if (command === "summarize" && !text) {
+    console.error(
+      'Please provide text to summarize. Example: node index.js summarize "Your text here"'
+    );
+    process.exitCode = 1;
+    return;
+  }
+
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey || apiKey === "your_api_key_here") {
@@ -39,8 +59,14 @@ async function main() {
   }
 
   const client = new OpenAI({ apiKey });
-  const greeting = await generateGreeting(client);
 
+  if (command === "summarize") {
+    const summary = await summarizeText(client, text);
+    console.log(summary);
+    return;
+  }
+
+  const greeting = await generateGreeting(client);
   console.log(greeting);
 }
 

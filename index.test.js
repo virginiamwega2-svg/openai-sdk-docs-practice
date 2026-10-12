@@ -1,10 +1,11 @@
-
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import OpenAI from "openai";
 import { getErrorMessage } from "./error-handler.js";
 import { generateGreeting, summarizeText } from "./index.js";
+
+// CLI validation tests
 
 test("shows a helpful error when the API key is missing", () => {
   const result = spawnSync(process.execPath, ["index.js"], {
@@ -21,6 +22,48 @@ test("shows a helpful error when the API key is missing", () => {
     /Missing API key\. Add a valid OPENAI_API_KEY to your \.env file\./
   );
 });
+
+test("shows a helpful message when summarize text is missing", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["index.js", "summarize"],
+    {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        OPENAI_API_KEY: "your_api_key_here",
+      },
+    }
+  );
+
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /Please provide text to summarize/
+  );
+});
+
+test("shows a helpful message for unknown commands", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["index.js", "unknown"],
+    {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        OPENAI_API_KEY: "your_api_key_here",
+      },
+    }
+  );
+
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /Unknown command\. Use "greet" or "summarize"\./
+  );
+});
+
+// SDK error-handling tests
 
 test("returns a helpful message for authentication errors", () => {
   const error = new OpenAI.AuthenticationError(
@@ -82,6 +125,8 @@ test("returns a generic message for unknown errors", () => {
   );
 });
 
+// Successful SDK response tests using mocks
+
 test("returns the greeting from a successful SDK response", async () => {
   const expectedGreeting = "Hello, developer!";
 
@@ -116,6 +161,8 @@ test("returns a summary from a successful SDK response", async () => {
 
   assert.equal(summary, expectedSummary);
 });
+
+// Input validation tests
 
 test("rejects empty text without calling the SDK", async () => {
   const mockClient = {
