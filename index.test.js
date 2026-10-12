@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import OpenAI from "openai";
 import { getErrorMessage } from "./error-handler.js";
-import { generateGreeting } from "./index.js";
+import { generateGreeting, summarizeText } from "./index.js";
 
 test("shows a helpful error when the API key is missing", () => {
   const result = spawnSync(process.execPath, ["index.js"], {
@@ -96,4 +96,57 @@ test("returns the greeting from a successful SDK response", async () => {
   const greeting = await generateGreeting(mockClient);
 
   assert.equal(greeting, expectedGreeting);
+});
+
+test("returns a summary from a successful SDK response", async () => {
+  const expectedSummary = "AI makes it easier to summarize text.";
+
+  const mockClient = {
+    responses: {
+      create: async () => ({
+        output_text: expectedSummary,
+      }),
+    },
+  };
+
+  const summary = await summarizeText(
+    mockClient,
+    "Artificial intelligence can help developers summarize long documents."
+  );
+
+  assert.equal(summary, expectedSummary);
+});
+
+test("rejects empty text without calling the SDK", async () => {
+  const mockClient = {
+    responses: {
+      create: async () => {
+        throw new Error("The API should not be called.");
+      },
+    },
+  };
+
+  await assert.rejects(
+    summarizeText(mockClient, ""),
+    {
+      message: "Text to summarize is required.",
+    }
+  );
+});
+
+test("rejects whitespace-only text without calling the SDK", async () => {
+  const mockClient = {
+    responses: {
+      create: async () => {
+        throw new Error("The API should not be called.");
+      },
+    },
+  };
+
+  await assert.rejects(
+    summarizeText(mockClient, "   "),
+    {
+      message: "Text to summarize is required.",
+    }
+  );
 });

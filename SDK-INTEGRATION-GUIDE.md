@@ -1,10 +1,11 @@
+
 # SDK Integration Guide
 
 ## Overview
 
-This guide explains how to integrate the OpenAI JavaScript SDK into a Node.js application, configure API credentials securely, make a request, and handle common errors.
+This guide explains how to integrate the OpenAI JavaScript SDK into a Node.js application, configure API credentials securely, make requests using the Responses API, validate input, and test the integration.
 
-It builds on the [QuickStart](QUICKSTART.md) by focusing on how developers can incorporate the SDK into their own applications.
+It builds on the [QuickStart](QUICKSTART.md) by explaining how the example functions work and how to test them without a real API key.
 
 ## Who This Guide Is For
 
@@ -14,69 +15,71 @@ This guide is for JavaScript developers who want to integrate the OpenAI SDK int
 
 By the end of this guide, you'll know how to:
 
-* Install and configure the SDK.
-* Store your API key securely using environment variables.
-* Make a request using the SDK.
-* Handle common errors.
-* Test your integration and troubleshoot problems.
+- Install and configure the SDK.
+- Store API credentials securely using environment variables.
+- Generate a greeting and summarize text using the Responses API.
+- Validate input before making a request.
+- Handle common SDK errors.
+- Test successful responses and invalid input using mocked clients.
 
 ## Prerequisites
 
 Before starting, make sure you have:
 
-* **Node.js:** An installed version compatible with the project's requirements.
-* **npm:** The package manager used to install dependencies.
-* **An OpenAI API key:** Required to make authenticated requests to the OpenAI API.
-* **Basic JavaScript knowledge:** Familiarity with importing packages, using environment variables, and working with asynchronous functions.
+- **Node.js:** Version 22 or later.
+- **npm:** The package manager used to install dependencies.
+- **Basic JavaScript knowledge:** Familiarity with imports, environment variables, and asynchronous functions.
+- **An OpenAI API key:** Required only for live API requests, not for installation or local mocked tests.
 
 You should also have a terminal and a code editor available.
 
-**Important:** Never commit your real API key to Git or expose it in client-side code. Store it in a local environment file and keep that file out of version control.
+**Security:** Never commit a real API key to Git or expose it in client-side code. Store it in a local `.env` file and keep that file out of version control.
 
 ## Installation and Configuration
 
 ### 1. Install the Dependencies
 
-In your project directory, run:
+From the project directory, run:
 
 ```bash
 npm install
 ```
 
-This installs the packages listed in `package.json`, including the OpenAI SDK and dotenv for environment variable loading.
+This installs the packages listed in `package.json`, including the OpenAI SDK and `dotenv`.
 
 ### 2. Configure Environment Variables
 
 Create a `.env` file in the project root if one does not already exist.
 
-Add your API key:
+Add the following placeholder:
 
 ```dotenv
 OPENAI_API_KEY=your_api_key_here
 ```
 
-Replace `your_api_key_here` with your actual API key. Do not include quotation marks unless your environment requires them.
+Replace the placeholder with a valid API key only when you intend to make a live API request.
 
 ### 3. Keep Credentials Secure
 
-* Never commit your real `.env` file to version control.
-* Do not hardcode API keys in application source code.
-* Do not expose secret API keys in browser-side applications.
-* If a key is exposed, revoke it and create a replacement.
+- Never commit your real `.env` file to version control.
+- Do not hardcode API keys in application source code.
+- Do not expose secret API keys in browser-side applications.
+- If a key is exposed, revoke it and create a replacement.
 
 ### 4. Verify the Configuration
 
-Before making a request, confirm that the environment variable is set and contains a valid API key.
+When the application starts, it checks whether `OPENAI_API_KEY` is missing or still contains the placeholder. If so, it displays a helpful error instead of making a request.
 
-The application checks for a missing or placeholder key and displays a helpful error instead of attempting the request.
+## Making Requests
 
-## Making a Request
+The project exports two functions from `index.js`:
 
-Once the dependencies and environment variables are configured, your application can use the OpenAI JavaScript SDK to send a request.
+- `generateGreeting(client)` generates a friendly, one-sentence greeting.
+- `summarizeText(client, text)` summarizes supplied text and rejects empty or whitespace-only input.
 
-### Example
+Both functions receive an initialized client as an argument. This makes them easier to test with a mock client.
 
-The following function uses an existing SDK client to request a friendly greeting:
+### Example 1: Generate a Greeting
 
 ```javascript
 export async function generateGreeting(client) {
@@ -89,18 +92,55 @@ export async function generateGreeting(client) {
 }
 ```
 
-### How It Works
+### Example 2: Summarize Text
 
-1. **Accept the client:** The function receives an initialized OpenAI client.
-2. **Send the request:** `client.responses.create()` sends the model and input to the Responses API.
-3. **Wait for the response:** `await` pauses execution until the request resolves or fails.
-4. **Return the result:** `response.output_text` provides the generated text.
+```javascript
+export async function summarizeText(client, text) {
+  if (typeof text !== "string" || !text.trim()) {
+    throw new Error("Text to summarize is required.");
+  }
 
-### Why Pass the Client Into the Function?
+  const response = await client.responses.create({
+    model: "gpt-5.5",
+    input: `Summarize the following text clearly and concisely:\n\n${text}`,
+  });
 
-Passing the client as an argument separates request logic from client initialization. It also makes the function easier to test with a mocked client, without requiring a real API key or network request.
+  return response.output_text;
+}
+```
 
-**Note:** This example uses the model configured in this project. Confirm that the model is available to your account before testing against the live API.
+### How the Functions Work
+
+1. **Accept the client:** Each function receives an initialized SDK client.
+2. **Validate input:** The summarizer checks that the supplied text is a non-empty string.
+3. **Send the request:** `client.responses.create()` sends the model and input to the Responses API.
+4. **Wait for the response:** `await` waits for the request to resolve or fail.
+5. **Return the result:** `response.output_text` provides the generated text.
+
+### Why Pass the Client Into the Functions?
+
+Passing the client as an argument separates request logic from client initialization. It also allows tests to provide a mock client, so the functions can be tested without a real API key or network request.
+
+**Model availability:** The examples use the model configured in this project. Its availability has not been verified against a live API account. Confirm that the selected model is available to your account before making a live request.
+
+## Input Validation
+
+The summarizer rejects input that is not a string or contains only whitespace.
+
+For example:
+
+```javascript
+await summarizeText(client, "");
+await summarizeText(client, "   ");
+```
+
+Both calls reject with the error message:
+
+```text
+Text to summarize is required.
+```
+
+Validation prevents an unnecessary SDK request when the input is invalid. Applications using this function should handle the rejected promise appropriately.
 
 ## Error Handling
 
@@ -110,59 +150,60 @@ This project uses `error-handler.js` to convert common SDK errors into more unde
 
 ### Common Errors
 
-| Error                | What It Means                                               | What to Check                                            |
-| -------------------- | ----------------------------------------------------------- | -------------------------------------------------------- |
-| Authentication error | The API key may be invalid or missing                       | Verify `OPENAI_API_KEY`                                  |
-| Permission error     | The account may not have access to the requested resource   | Check your account permissions and model access          |
-| Rate limit error     | The request may exceed an applicable rate limit or quota    | Check your usage, limits, and billing status             |
-| Connection error     | The application could not establish a successful connection | Check your network connection and retry when appropriate |
-| Unknown error        | The failure does not match a specifically handled case      | Inspect the error details securely                       |
+| Error | What It Means | What to Check |
+|---|---|---|
+| Authentication error | The API key may be invalid | Verify `OPENAI_API_KEY` |
+| Permission error | The account may not have access to the requested resource | Check account permissions and model access |
+| Rate limit error | The request may exceed an applicable limit or quota | Check usage, limits, and billing |
+| Connection error | The application could not establish a successful connection | Check your network connection |
+| Unknown error | The failure does not match a specifically handled case | Inspect error details securely |
 
 ### Recommended Practices
 
-* Give developers actionable error messages.
-* Never print API keys or other secrets in error logs.
-* Avoid retrying every failure indiscriminately.
-* Use bounded retries with backoff for transient failures when appropriate.
-* Check the underlying error details during development, while avoiding the exposure of sensitive information.
-
-### Testing Error Handling
-
-The project's automated tests use simulated errors to verify that the error handler produces the expected messages.
-
-These tests verify local error-handling behaviour; they do not establish that a live API request will succeed.
+- Give developers actionable error messages.
+- Never print API keys or other secrets in error logs.
+- Avoid retrying every failure indiscriminately.
+- Use bounded retries with backoff for transient failures when appropriate.
+- Avoid exposing sensitive error details to end users.
 
 ## Testing the Integration
 
-Testing helps verify that the SDK integration behaves as expected and that common failure cases are handled clearly.
-
-### Run the Automated Tests
-
-From the project root, run:
+Run the automated tests from the project root:
 
 ```bash
 npm test
 ```
 
-The test suite uses Node.js's built-in test runner to check the application's behaviour.
+The project uses Node.js's built-in test runner.
 
 ### What the Tests Cover
 
-The current tests verify that:
+The current test suite verifies that:
 
-* The application reports a missing API key.
-* Common SDK errors are converted into helpful messages.
-* Unknown errors receive a generic fallback message.
-* The greeting function returns the text from a successful mocked SDK response.
+- The application reports a missing API key.
+- Common SDK errors are converted into helpful messages.
+- Unknown errors receive a generic fallback message.
+- The greeting function returns the expected text from a mocked SDK response.
+- The summarizer returns the expected text from a mocked SDK response.
+- Empty and whitespace-only summarizer inputs are rejected without calling the mocked SDK.
+
+The latest local test run reported **10 passing tests and 0 failures**.
 
 ### Understand the Limitations
 
 The tests use simulated responses and errors. They do not send real requests to the OpenAI API.
 
-A passing test suite confirms the behaviour covered by those tests, but it does not verify API credentials, account permissions, model availability, network connectivity, or live API responses.
+Passing tests confirms the behavior covered by the tests, but does not verify credentials, account permissions, model availability, network connectivity, or live API responses.
 
-### Before Testing Against the Live API
+## Before Testing Against the Live API
 
-Once you have a valid API key, you can run the application using the instructions in [QUICKSTART.md](QUICKSTART.md).
+Once you have a valid API key and the necessary API access, follow the instructions in [QUICKSTART.md](QUICKSTART.md).
 
-Confirm that your credentials are configured securely and that the selected model is available to your account before making a live request.
+Keep your credentials secure and verify model availability before making a live request.
+
+## Related Documentation
+
+- [QuickStart Guide](QUICKSTART.md) — Set up the project and run the example.
+- [Troubleshooting Guide](TROUBLESHOOTING.md) — Diagnose common issues and recover.
+- [Validation Report](VALIDATION-REPORT.md) — Review the existing documentation validation checks.
+- [README](README.md) — Start here for an overview of the project.
