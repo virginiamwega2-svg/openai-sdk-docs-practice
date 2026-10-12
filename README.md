@@ -95,3 +95,24 @@ The local tests do not verify live API access, model availability, account permi
 The goal is to make SDK onboarding easier by testing documentation against the actual implementation, anticipating common errors, and helping developers understand how to recover when something goes wrong.
 
 This project treats documentation as an essential part of the developer experience: instructions should be clear, examples should be usable, and errors should help developers take the next step.
+
+## Continuous Integration
+
+This project uses GitHub Actions to run the automated test suite whenever changes are pushed to the repository or a pull request is opened.
+
+The workflow:
+
+* Checks out the repository.
+* Sets up Node.js 22.
+* Installs dependencies using `npm ci`.
+* Runs the automated tests using `npm test`.
+
+This helps verify the project’s behavior consistently and catch regressions as the code evolves.
+
+**Local verification:**
+
+```bash
+npm test
+```
+
+**Workflow:** `.github/workflows/tests.yml`
