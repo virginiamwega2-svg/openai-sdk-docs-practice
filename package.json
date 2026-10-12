@@ -1,7 +1,7 @@
 {
   "name": "openai-sdk-docs-practice",
   "version": "1.0.0",
-  "description": "",
+  "description": "A practical project for learning OpenAI SDK integration, error handling, testing, and AI developer documentation.",
   "main": "index.js",
  "scripts": {
   "start": "node index.js",
