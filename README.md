@@ -1,25 +1,29 @@
 # OpenAI SDK Documentation Practice
 
-A hands-on project exploring the developer experience of using the OpenAI JavaScript SDK. It focuses on setup instructions, API key handling, error messages, troubleshooting, and automated tests.
+A hands-on project exploring the developer experience of using the OpenAI JavaScript SDK. It focuses on developer onboarding, secure API key configuration, error handling, troubleshooting, and automated testing.
 
 ## What This Project Demonstrates
 
-* Setting up a Node.js project with the OpenAI SDK.
-* Configuring environment variables securely with `dotenv`.
-* Making a request using the OpenAI Responses API.
-* Providing helpful error messages for common failures.
-* Writing local tests without making live API requests.
+* Setting up a Node.js project with the OpenAI JavaScript SDK.
+* Managing environment variables securely with `dotenv`.
+* Making requests using the OpenAI Responses API.
+* Providing clear, actionable error messages for common failures.
+* Writing automated tests without making live API requests.
+* Improving developer documentation through practical testing and iteration.
 
 ## Getting Started
 
 ### Prerequisites
 
-* Node.js 22 or later and npm.
-* A code editor, such as VS Code.
+* Node.js 22 or later.
+* npm.
+* A code editor, such as Visual Studio Code.
 
-**Note:** You do not need a real OpenAI API key to install dependencies or run the local tests. A valid API key is required only if you want to make a live API request.
+**Note:** You do not need a real OpenAI API key to install dependencies or run the local tests. A valid API key is required only when making a live API request.
 
 ### 1. Install Dependencies
+
+Clone the repository, navigate to the project directory, and install the dependencies:
 
 ```bash
 npm install
@@ -39,22 +43,40 @@ Replace the placeholder with a valid API key only if you intend to make a live A
 
 ### 3. Run the Tests
 
+Run the automated test suite:
+
 ```bash
 npm test
 ```
 
-The local test suite checks missing-key handling and error-message behavior without making live API requests.
+The local tests verify missing API key handling and error-message behavior without making live API requests.
 
-### 4. Explore the Documentation
+### 4. Run the Example
 
-* [QuickStart Guide](./QUICKSTART.md)
-* [Troubleshooting Guide](./TROUBLESHOOTING.md)
-* [SDK Documentation Audit](./SDK-DOCUMENTATION-AUDIT.md)
+To make a live request using the OpenAI SDK, run:
+
+```bash
+node index.js
+```
+
+This requires a valid API key in your `.env` file, as well as the necessary API access and configuration. If the request fails, the application displays a user-friendly error message.
+
+**Note:** Running the example may use your OpenAI API account and incur charges, depending on the request and applicable pricing.
+
+### 5. Explore the Documentation
+
+* [QuickStart Guide](./QUICKSTART.md) — Follow the setup instructions and get started.
+* [Troubleshooting Guide](./TROUBLESHOOTING.md) — Diagnose common issues and learn how to recover.
+* [SDK Documentation Audit](./SDK-DOCUMENTATION-AUDIT.md) — Review documentation quality and identify opportunities to improve the developer experience.
 
 ## Project Limitations
 
-The local tests do not verify live API access, model availability, account permissions, or billing. A successful test run does not mean a live API request has succeeded.
+The local tests do not verify live API access, model availability, account permissions, or billing.
+
+**Passing the local tests does not guarantee that a live API request will succeed.** Live requests depend on valid credentials, API access, model availability, account configuration, and network connectivity.
 
 ## Why This Project Exists
 
-The goal is to make SDK onboarding easier by testing instructions, anticipating common errors, and documenting practical ways for developers to recover when something goes wrong.
+The goal is to make SDK onboarding easier by testing documentation against the actual implementation, anticipating common errors, and helping developers understand how to recover when something goes wrong.
+
+This project treats documentation as an essential part of the developer experience: instructions should be clear, examples should be usable, and errors should help developers take the next step.
