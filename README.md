@@ -65,9 +65,12 @@ This requires a valid API key in your `.env` file, as well as the necessary API 
 
 ### 5. Explore the Documentation
 
-* [QuickStart Guide](./QUICKSTART.md) — Follow the setup instructions and get started.
+* [QuickStart Guide](./QUICKSTART.md) — Set up the project and run the example.
+* [SDK Integration Guide](./SDK-INTEGRATION-GUIDE.md) — Understand how the OpenAI SDK is integrated and how the example works.
 * [Troubleshooting Guide](./TROUBLESHOOTING.md) — Diagnose common issues and learn how to recover.
-* [SDK Documentation Audit](./SDK-DOCUMENTATION-AUDIT.md) — Review documentation quality and identify opportunities to improve the developer experience.
+* [Validation Report](./VALIDATION-REPORT.md) — Review the checks performed to verify documentation against the implementation.
+* [SDK Documentation Audit](./SDK-DOCUMENTATION-AUDIT.md) — Review documentation quality and opportunities to improve the developer experience.
+
 
 ## Project Limitations
 
