@@ -1,8 +1,10 @@
+
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import OpenAI from "openai";
 import { getErrorMessage } from "./error-handler.js";
+import { generateGreeting } from "./index.js";
 
 test("shows a helpful error when the API key is missing", () => {
   const result = spawnSync(process.execPath, ["index.js"], {
@@ -12,14 +14,29 @@ test("shows a helpful error when the API key is missing", () => {
       OPENAI_API_KEY: "your_api_key_here",
     },
   });
-  test("returns a helpful message for authentication errors", () => {
+
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /Missing API key\. Add a valid OPENAI_API_KEY to your \.env file\./
+  );
+});
+
+test("returns a helpful message for authentication errors", () => {
   const error = new OpenAI.AuthenticationError(
     401,
     { message: "Invalid API key" },
     "Invalid API key",
     new Headers()
   );
-  test("returns a helpful message for permission errors", () => {
+
+  assert.equal(
+    getErrorMessage(error),
+    "Authentication failed. Check that your API key is valid."
+  );
+});
+
+test("returns a helpful message for permission errors", () => {
   const error = new OpenAI.PermissionDeniedError(
     403,
     { message: "Permission denied" },
@@ -65,15 +82,18 @@ test("returns a generic message for unknown errors", () => {
   );
 });
 
-  assert.equal(
-    getErrorMessage(error),
-    "Authentication failed. Check that your API key is valid."
-  );
-});
+test("returns the greeting from a successful SDK response", async () => {
+  const expectedGreeting = "Hello, developer!";
 
-  assert.equal(result.status, 1);
-  assert.match(
-    result.stderr,
-    /Missing API key\. Add a valid OPENAI_API_KEY to your \.env file\./
-  );
+  const mockClient = {
+    responses: {
+      create: async () => ({
+        output_text: expectedGreeting,
+      }),
+    },
+  };
+
+  const greeting = await generateGreeting(mockClient);
+
+  assert.equal(greeting, expectedGreeting);
 });

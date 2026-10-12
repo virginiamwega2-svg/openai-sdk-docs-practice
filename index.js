@@ -1,7 +1,18 @@
 
 import "dotenv/config";
 import OpenAI from "openai";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { getErrorMessage } from "./error-handler.js";
+
+export async function generateGreeting(client) {
+  const response = await client.responses.create({
+    model: "gpt-5.5",
+    input: "Write a friendly one-sentence greeting.",
+  });
+
+  return response.output_text;
+}
 
 async function main() {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -15,15 +26,18 @@ async function main() {
   }
 
   const client = new OpenAI({ apiKey });
+  const greeting = await generateGreeting(client);
 
-  const response = await client.responses.create({
-    model: "gpt-5.5",
-    input: "Write a friendly one-sentence greeting.",
-  });
-
-  console.log(response.output_text);
+  console.log(greeting);
 }
-main().catch((error) => {
-  console.error(getErrorMessage(error));
-  process.exitCode = 1;
-});
+
+const isMainModule =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+
+if (isMainModule) {
+  main().catch((error) => {
+    console.error(getErrorMessage(error));
+    process.exitCode = 1;
+  });
+}

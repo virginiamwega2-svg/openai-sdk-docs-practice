@@ -1,13 +1,13 @@
 # OpenAI Node.js SDK Quickstart
 
-This guide walks you through setting up the OpenAI JavaScript SDK, protecting your API key, running a simple example, and testing error handling.
+This guide walks you through setting up the OpenAI JavaScript SDK, protecting your API key, running a simple example, and testing common success and failure scenarios.
 
-This practice project demonstrates SDK setup, developer onboarding, troubleshooting, and automated testing. You do not need a real API key to install dependencies or run the local tests.
+This practice project demonstrates SDK integration, developer onboarding, error handling, and automated testing. You can install dependencies and run all local tests without a real API key.
 
 ## Choose Your Path
 
-* **Use the existing project:** If you have cloned this repository, install its dependencies, configure your environment, run the example, and execute the tests.
-* **Build from scratch:** If you want to recreate the project yourself, follow the setup and code sections in order, including the supporting error handler and test files.
+* **Use the existing project:** Install dependencies, configure your environment, run the example, and execute the tests.
+* **Build from scratch:** Follow the setup and code sections in order, including the supporting error handler and test files.
 
 ## Prerequisites
 
@@ -68,32 +68,26 @@ This installs the dependencies declared in the existing `package.json` and lockf
 
 Open `package.json`.
 
-The project must support JavaScript ES modules. Ensure the following property appears at the top level:
+Ensure that the following properties are present at the top level:
 
 ```json
-"type": "module"
-```
-
-The project also declares its minimum Node.js version:
-
-```json
-"engines": {
-  "node": ">=22.0.0"
+{
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  }
 }
 ```
 
-For a fresh project, configure the relevant scripts inside the existing `scripts` object:
+This is an illustrative configuration snippet, not a complete replacement for your existing `package.json`. Preserve your project's name, dependencies, and other configuration.
 
-```json
-"start": "node index.js",
-"test": "node --test"
-```
+The `type` property enables JavaScript ES modules. The `start` script runs the example, while the `test` script runs the local automated tests.
 
-Keep the existing dependencies and any other scripts. Do not paste these snippets into `package.json` as standalone JSON objects; merge the properties into the appropriate locations and preserve valid JSON syntax.
-
-The `type` setting enables JavaScript's `import` syntax. The `start` script runs the example, while the `test` script runs the local automated tests.
-
-**Important:** If you are using the existing repository, follow the scripts already defined in its `package.json`. Do not replace a working configuration just to match these examples.
+**Important:** If you are using the existing repository, follow the scripts already defined in its `package.json`. Do not replace a working configuration just to match this example.
 
 ## 4. Configure Your API Key Securely
 
@@ -103,7 +97,7 @@ Create a file named `.env` in the project root:
 OPENAI_API_KEY=your_api_key_here
 ```
 
-The value is a placeholder, not a real API key. Replace it with a valid key only when you are ready to make a live API request.
+The value above is a placeholder, not a real API key. Replace it with a valid key only when you are ready to make a live API request.
 
 Ensure that `.gitignore` includes:
 
@@ -130,7 +124,18 @@ Create `index.js` in the project root and add:
 ```javascript
 import "dotenv/config";
 import OpenAI from "openai";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { getErrorMessage } from "./error-handler.js";
+
+export async function generateGreeting(client) {
+  const response = await client.responses.create({
+    model: "gpt-5.5",
+    input: "Write a friendly one-sentence greeting.",
+  });
+
+  return response.output_text;
+}
 
 async function main() {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -144,19 +149,21 @@ async function main() {
   }
 
   const client = new OpenAI({ apiKey });
+  const greeting = await generateGreeting(client);
 
-  const response = await client.responses.create({
-    model: "gpt-5.5",
-    input: "Write a friendly one-sentence greeting.",
-  });
-
-  console.log(response.output_text);
+  console.log(greeting);
 }
 
-main().catch((error) => {
-  console.error(getErrorMessage(error));
-  process.exitCode = 1;
-});
+const isMainModule =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+
+if (isMainModule) {
+  main().catch((error) => {
+    console.error(getErrorMessage(error));
+    process.exitCode = 1;
+  });
+}
 ```
 
 This example uses the OpenAI Responses API to request a short greeting. It relies on `error-handler.js` to translate recognized API errors into clearer messages.
@@ -168,20 +175,22 @@ Ensure that the configured model is available to your API project and that your 
 * `import "dotenv/config"` loads environment variables from `.env`.
 * The API key check stops execution if the key is missing or still contains the placeholder.
 * `new OpenAI({ apiKey })` creates an SDK client using the supplied key.
-* `client.responses.create()` sends a request to the Responses API.
+* `generateGreeting(client)` sends a request through the SDK and returns the generated text.
+* `client.responses.create()` calls the Responses API.
 * `model` identifies the requested model.
 * `input` contains the prompt sent to the model.
 * `response.output_text` provides the generated text.
+* `pathToFileURL()` and `resolve()` help determine whether the file is being run directly, including on Windows.
 * The error handler displays a user-friendly message when a request fails.
 
 Setting `process.exitCode = 1` indicates failure to the operating system without immediately terminating the process.
 
 ### Required supporting files
 
-The complete practice project also includes:
+The complete practice project includes:
 
 * **`error-handler.js`** — Exports `getErrorMessage` and handles the error categories covered by the tests.
-* **`index.test.js`** — Contains six local tests for the API key check and error-handling behavior.
+* **`index.test.js`** — Contains seven local tests covering API key validation, error handling, and a mocked successful SDK response.
 
 When building from scratch, create these files as well. The example will not run correctly without its imported error handler.
 
@@ -217,7 +226,7 @@ It stops before making an API request and sets a non-zero exit code.
 
 The program attempts to send a request and print the generated greeting.
 
-A successful live API request has **not** been verified in this project. Live execution depends on valid credentials, API access, model availability, account configuration, and network connectivity.
+A successful live API request has **not yet been verified** in this project. Live execution depends on valid credentials, API access, model availability, account configuration, and network connectivity.
 
 Live API requests may incur charges. Check your API access and applicable pricing before making one.
 
@@ -229,7 +238,7 @@ Run the local test suite:
 npm test
 ```
 
-The six tests cover:
+The seven tests cover:
 
 1. Missing or placeholder API key.
 2. Authentication errors.
@@ -237,20 +246,23 @@ The six tests cover:
 4. Rate-limit or quota errors.
 5. Connection errors.
 6. Unexpected errors.
+7. A mocked successful SDK response.
 
 The tests run locally without making live API requests.
 
 A successful run should report results equivalent to:
 
 ```text
-ℹ tests 6
-ℹ pass 6
+ℹ tests 7
+ℹ pass 7
 ℹ fail 0
 ```
 
 The exact output format may vary by Node.js version.
 
-**Verified locally:** The practice project's six tests passed. This confirms the tested local behavior, not the success of a live API request.
+**Verified locally:** All seven tests passed in the latest recorded test run. This confirms the tested local behavior, not the success of a live API request.
+
+The successful-response test uses a mock client that returns a response-shaped object. It verifies how `generateGreeting()` handles that object; it does not verify the live OpenAI SDK, network connectivity, or model access.
 
 If a test fails, read the failure message and compare the actual behavior with the expected result before changing the implementation.
 
@@ -330,8 +342,8 @@ You have completed the local setup and verification when you can:
 * Install the project's dependencies.
 * Configure an API key without exposing it.
 * Run the example and understand its missing-key behavior.
-* Explain the difference between a local validation check and a live API request.
-* Run all six automated tests successfully.
+* Explain the difference between a local validation check, a mocked response, and a live API request.
+* Run all seven automated tests successfully.
 * Find guidance for common errors and understand the next troubleshooting step.
 
 A successful live API request additionally requires valid credentials, suitable permissions, access to the configured model, and working network connectivity. Live API success has not been verified as part of this practice project.
