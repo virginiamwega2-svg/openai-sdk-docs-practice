@@ -51,17 +51,29 @@ npm test
 
 The local tests verify missing API key handling and error-message behavior without making live API requests.
 
+
 ### 4. Run the Example
 
-To make a live request using the OpenAI SDK, run:
+The project supports two commands:
 
-```bash
+**Generate a greeting**
+
+```powershell
 node index.js
 ```
 
-This requires a valid API key in your `.env` file, as well as the necessary API access and configuration. If the request fails, the application displays a user-friendly error message.
+**Summarize text**
 
-**Note:** Running the example may use your OpenAI API account and incur charges, depending on the request and applicable pricing.
+```powershell
+node index.js summarize "Developer documentation helps developers use software effectively."
+```
+
+Both commands make live API requests and require a valid OpenAI API key in your `.env` file, along with the necessary API access and configuration.
+
+For input validation examples, see the [QuickStart Guide](./QUICKSTART.md).
+
+**Note:** Live API requests may incur charges depending on your account and usage. The automated tests use mocks and do not require live API access.
+
 
 ### 5. Explore the Documentation
 
