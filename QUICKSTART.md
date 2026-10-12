@@ -190,7 +190,8 @@ Setting `process.exitCode = 1` indicates failure to the operating system without
 The complete practice project includes:
 
 * **`error-handler.js`** — Exports `getErrorMessage` and handles the error categories covered by the tests.
-* **`index.test.js`** — Contains seven local tests covering API key validation, error handling, and a mocked successful SDK response.
+* **`index.test.js`** — Contains 12 local tests covering CLI validation, SDK error handling, mocked successful responses, and summarization input validation.
+
 
 When building from scratch, create these files as well. The example will not run correctly without its imported error handler.
 
@@ -198,21 +199,23 @@ If you are using the existing repository, these files should already be included
 
 ## 6. Run the Example
 
-If your `package.json` defines the `start` script shown earlier, run:
+This project supports two commands: `greet` and `summarize`.
 
-```bash
+### Run the greeting example
+
+To generate a friendly greeting, run:
+
+```powershell
 npm start
 ```
 
-Alternatively, run the file directly:
+You can also specify the command explicitly:
 
-```bash
-node index.js
+```powershell
+node index.js greet
 ```
 
-### If you have not configured a real API key
-
-The program should display:
+If you have not configured a valid API key, the program should display:
 
 ```text
 Missing API key. Add a valid OPENAI_API_KEY to your .env file.
@@ -220,15 +223,42 @@ Missing API key. Add a valid OPENAI_API_KEY to your .env file.
 
 It stops before making an API request and sets a non-zero exit code.
 
-**Verified locally:** The missing-key behavior has been tested in this practice project.
+### Run the summarization example
 
-### If you have a valid API key
+Pass the text you want to summarize in quotation marks:
 
-The program attempts to send a request and print the generated greeting.
+```powershell
+node index.js summarize "Developer documentation helps developers understand and use software independently."
+```
+
+The program sends the supplied text to the configured model and prints the returned summary.
+
+### Understand input validation
+
+Try running the summarization command without text:
+
+```powershell
+node index.js summarize
+```
+
+The program should display usage guidance and exit with a non-zero exit code without making an API request.
+
+Try an unsupported command:
+
+```powershell
+node index.js unknown
+```
+
+The program should explain that the supported commands are `greet` and `summarize`, then exit with a non-zero exit code.
+
+### API key and live execution
+
+Local validation and automated tests do not require a valid API key. Live greeting and summarization requests do.
 
 A successful live API request has **not yet been verified** in this project. Live execution depends on valid credentials, API access, model availability, account configuration, and network connectivity.
 
 Live API requests may incur charges. Check your API access and applicable pricing before making one.
+
 
 ## 7. Run the Automated Tests
 
@@ -237,16 +267,20 @@ Run the local test suite:
 ```bash
 npm test
 ```
+The 12 tests cover:
 
-The seven tests cover:
-
-1. Missing or placeholder API key.
-2. Authentication errors.
-3. Permission errors.
-4. Rate-limit or quota errors.
-5. Connection errors.
-6. Unexpected errors.
-7. A mocked successful SDK response.
+1. Missing API key handling.
+2. Missing text for the summarization command.
+3. Unsupported CLI commands.
+4. Authentication error handling.
+5. Permission error handling.
+6. Rate-limit error handling.
+7. Connection error handling.
+8. Unexpected error handling.
+9. Successful greeting with a mocked SDK response.
+10. Successful summarization with a mocked SDK response.
+11. Empty summarization input validation.
+12. Whitespace-only summarization input validation.
 
 The tests run locally without making live API requests.
 
@@ -260,7 +294,8 @@ A successful run should report results equivalent to:
 
 The exact output format may vary by Node.js version.
 
-**Verified locally:** All seven tests passed in the latest recorded test run. This confirms the tested local behavior, not the success of a live API request.
+**Verified locally:** All 12 tests passed in the latest recorded test run. This confirms the tested local behavior, not the success of a live API request.
+
 
 The successful-response test uses a mock client that returns a response-shaped object. It verifies how `generateGreeting()` handles that object; it does not verify the live OpenAI SDK, network connectivity, or model access.
 
