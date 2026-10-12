@@ -15,7 +15,9 @@ This guide supports two ways to get started:
 
 Before you begin, make sure you have:
 
-* **Node.js:** Version 22 or later. Check the [OpenAI Node.js SDK README](https://github.com/openai/openai-node) for the currently supported Node.js versions.
+* **Node.js:** Version 22 or later, as declared by this project. Check the [OpenAI Node.js SDK README](https://github.com/openai/openai-node) for the SDK's currently supported Node.js versions.
+
+
 * **npm:** Included with Node.js.
 * **An OpenAI API key:** Required only if you want to make a live API request.
 
