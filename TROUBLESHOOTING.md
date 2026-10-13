@@ -41,23 +41,43 @@ The API key may be invalid, incorrectly copied, revoked, or unavailable to the r
 
 Do not share your API key when asking for help.
 
-## 3. Permission or quota error
+## 3. Permission error
 
 **Symptom**
 
-The request fails with a permission, rate-limit, or quota-related message.
+The API rejects the request because the API key or project does not have the required access.
 
 **Cause**
 
-The API key may lack the required permissions, the selected project may not have access to the requested model, or the account may have reached a usage limit.
+The API key may lack the necessary permissions, or the selected project may not have access to the requested model or operation.
 
 **How to fix it**
 
-1. Check that your API key has the required permissions and that the selected project has access to the requested model.
-2. Review your usage limits and billing settings.
-3. If the issue persists, consult the official OpenAI API documentation.
+1. Confirm that you are using the intended API key and project.
+2. Check the key's permissions and the project's model access.
+3. Consult the official OpenAI API documentation for the relevant endpoint or model.
+4. Retry after correcting the access issue.
 
-## 4. Connection error
+## 4. Rate-limit or quota error
+
+**Symptom**
+
+The request fails because a rate limit or usage limit has been reached.
+
+**Cause**
+
+You may be sending requests too frequently, have insufficient available quota, or have reached an account usage limit.
+
+**How to fix it**
+
+1. Check the error message to determine whether it indicates a rate limit or an exhausted quota.
+2. For rate limits, reduce request frequency and retry with an appropriate delay. When implementing automatic retries, consider using exponential backoff.
+3. For quota or billing-related errors, review your account's usage limits and billing settings.
+4. Retry after addressing the underlying issue.
+
+**Important:** Waiting may help with a temporary rate limit, but it will not resolve an exhausted quota or missing permissions by itself.
+
+## 5. Connection error
 
 **Symptom**
 
@@ -75,7 +95,7 @@ The network may be unavailable, or a connection-related failure may have occurre
 
 The current error handler provides a specific message for `APIConnectionError`. Other connection-related failures may use the general fallback message.
 
-## 5. Other request errors
+## 6. Other request errors
 
 **Symptom**
 
