@@ -28,7 +28,7 @@ A hands-on project exploring the developer experience of using the OpenAI JavaSc
 Clone the repository, navigate to the project directory, and install the dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
 ### 2. Configure Your Environment

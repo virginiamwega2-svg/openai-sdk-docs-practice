@@ -56,13 +56,15 @@ The `dotenv` package loads environment variables from your `.env` file.
 
 This project uses Node.js's built-in test runner, so a separate testing framework is not required.
 
-If you cloned the repository, run:
+If you cloned the repository and its `package-lock.json` file is present, run:
 
 ```bash
-npm install
+npm ci
 ```
 
-This installs the dependencies declared in the existing `package.json` and lockfile.
+This installs the exact dependency versions recorded in the lockfile, helping ensure a reproducible setup. Note that `npm ci` removes the existing `node_modules` directory before installing dependencies.
+
+For an existing project, use `npm install` when you intentionally need to update dependencies or regenerate the lockfile.
 
 ## 3. Configure the Project
 
@@ -117,9 +119,14 @@ If `.gitignore` already exists, add these entries without removing its other rul
 
 The example checks for a missing or placeholder API key before attempting a request. This is a useful safeguard, but it does not replace secure secret management.
 
-## 5. Create the SDK Example
+## 5. Understand the Existing SDK Implementation
 
-Create `index.js` in the project root and add:
+If you are using the existing repository, you do not need to recreate `index.js`. The project already includes the CLI implementation, SDK integration, input validation, and error handling for the `greet` and `summarize` commands.
+
+Read the existing `index.js` to understand how the application initializes the OpenAI SDK, validates inputs, handles errors, and processes API responses.
+
+The simplified example below illustrates the greeting request flow. It is a learning example, not a complete replacement for the repository's implementation. If you are building from scratch, follow the example and create the required supporting files, then add the summarization command and its validation before expecting the full CLI behavior documented in Section 6.
+
 
 ```javascript
 import "dotenv/config";
@@ -287,8 +294,8 @@ The tests run locally without making live API requests.
 A successful run should report results equivalent to:
 
 ```text
-ℹ tests 7
-ℹ pass 7
+ℹ tests 12
+ℹ pass 12
 ℹ fail 0
 ```
 
@@ -378,7 +385,7 @@ You have completed the local setup and verification when you can:
 * Configure an API key without exposing it.
 * Run the example and understand its missing-key behavior.
 * Explain the difference between a local validation check, a mocked response, and a live API request.
-* Run all seven automated tests successfully.
+* Run all 12 automated tests successfully.
 * Find guidance for common errors and understand the next troubleshooting step.
 
 A successful live API request additionally requires valid credentials, suitable permissions, access to the configured model, and working network connectivity. Live API success has not been verified as part of this practice project.
