@@ -24,21 +24,28 @@ The purpose of this review was to verify that the project's SDK documentation ac
 
 The project's local test suite was executed using `npm test`.
 
-**Result: 7 tests passed, 0 failed.**
+**Result: 12 tests passed, 0 failed.**
 
 The tests cover:
 
 * Missing or placeholder API key handling.
-* Authentication errors.
-* Permission errors.
-* Rate-limit errors.
-* Connection errors.
-* Unexpected errors.
-* A successful greeting returned by a mocked SDK client.
+* Missing text for the summarization command.
+* Unsupported CLI commands.
+* Authentication error handling.
+* Permission error handling.
+* Rate-limit error handling.
+* Connection error handling.
+* Unexpected error handling.
+* Successful greeting generation using a mocked SDK response.
+* Successful summarization using a mocked SDK response.
+* Empty summarization input validation.
+* Whitespace-only summarization input validation.
 
 These results provide evidence that the tested local behavior works as expected.
 
-The successful-response test uses a mock client. It does not verify a live request to the OpenAI API.
+The successful-response tests use a mock client. They verify how the application handles simulated SDK responses; they do not verify a live request to the OpenAI API, network connectivity, or access to the configured model.
+
+**Verification status:** All 12 automated tests passed in the latest recorded local test run. A successful live API request has not been verified as part of this review.
 
 ## 5. Limitations
 
