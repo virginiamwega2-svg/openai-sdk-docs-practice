@@ -29,11 +29,35 @@ export async function summarizeText(client, text) {
   return response.output_text;
 }
 
+export async function streamText(client, prompt, onText) {
+  if (typeof prompt !== "string" || !prompt.trim()) {
+    throw new Error("Prompt is required.");
+  }
+
+  if (typeof onText !== "function") {
+    throw new Error("A text callback is required.");
+  }
+
+  const stream = await client.responses.create({
+    model: MODEL,
+    input: prompt,
+    stream: true,
+  });
+
+  for await (const event of stream) {
+    if (event.type === "response.output_text.delta") {
+      onText(event.delta);
+    }
+  }
+}
+
 async function main() {
   const [command = "greet", ...args] = process.argv.slice(2);
 
-  if (command !== "greet" && command !== "summarize") {
-    console.error('Unknown command. Use "greet" or "summarize".');
+  if (!["greet", "summarize", "stream"].includes(command)) {
+    console.error(
+      'Unknown command. Use "greet", "summarize", or "stream".'
+    );
     process.exitCode = 1;
     return;
   }
@@ -43,6 +67,14 @@ async function main() {
   if (command === "summarize" && !text) {
     console.error(
       'Please provide text to summarize. Example: node index.js summarize "Your text here"'
+    );
+    process.exitCode = 1;
+    return;
+  }
+
+  if (command === "stream" && !text) {
+    console.error(
+      'Please provide a prompt. Example: node index.js stream "Explain how an API works"'
     );
     process.exitCode = 1;
     return;
@@ -63,6 +95,14 @@ async function main() {
   if (command === "summarize") {
     const summary = await summarizeText(client, text);
     console.log(summary);
+    return;
+  }
+
+  if (command === "stream") {
+    await streamText(client, text, (chunk) => {
+      process.stdout.write(chunk);
+    });
+    process.stdout.write("\n");
     return;
   }
 

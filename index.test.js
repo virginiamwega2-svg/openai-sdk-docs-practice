@@ -3,7 +3,11 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import OpenAI from "openai";
 import { getErrorMessage } from "./error-handler.js";
-import { generateGreeting, summarizeText } from "./index.js";
+import {
+  generateGreeting,
+  summarizeText,
+  streamText,
+} from "./index.js";
 
 // CLI validation tests
 
@@ -59,7 +63,7 @@ test("shows a helpful message for unknown commands", () => {
   assert.equal(result.status, 1);
   assert.match(
     result.stderr,
-    /Unknown command\. Use "greet" or "summarize"\./
+    /Unknown command\. Use "greet", "summarize", or "stream"\./
   );
 });
 
@@ -195,5 +199,131 @@ test("rejects whitespace-only text without calling the SDK", async () => {
     {
       message: "Text to summarize is required.",
     }
+  );
+});
+
+ // Streaming SDK tests using mocked events
+
+test("streams text fragments in order", async () => {
+  const receivedText = [];
+
+  const events = [
+    { type: "response.output_text.delta", delta: "Hello" },
+    { type: "response.output_text.delta", delta: ", developer!" },
+    { type: "response.completed" },
+  ];
+
+  const mockClient = {
+    responses: {
+      create: async (options) => {
+        assert.equal(options.stream, true);
+        return (async function* () {
+          for (const event of events) {
+            yield event;
+          }
+        })();
+      },
+    },
+  };
+
+  await streamText(mockClient, "Greet a developer", (text) => {
+    receivedText.push(text);
+  });
+
+  assert.deepEqual(receivedText, ["Hello", ", developer!"]);
+  assert.equal(receivedText.join(""), "Hello, developer!");
+});
+
+test("ignores non-text streaming events", async () => {
+  const receivedText = [];
+
+  const mockClient = {
+    responses: {
+      create: async () =>
+        (async function* () {
+          yield { type: "response.created" };
+          yield {
+            type: "response.output_text.delta",
+            delta: "Useful text",
+          };
+          yield { type: "response.completed" };
+        })(),
+    },
+  };
+
+  await streamText(mockClient, "Give me useful text", (text) => {
+    receivedText.push(text);
+  });
+
+  assert.deepEqual(receivedText, ["Useful text"]);
+});
+
+test("rejects an empty streaming prompt without calling the SDK", async () => {
+  const mockClient = {
+    responses: {
+      create: async () => {
+        throw new Error("The API should not be called.");
+      },
+    },
+  };
+
+  await assert.rejects(
+    streamText(mockClient, "", () => {}),
+    { message: "Prompt is required." }
+  );
+});
+
+test("rejects a missing streaming callback without calling the SDK", async () => {
+  const mockClient = {
+    responses: {
+      create: async () => {
+        throw new Error("The API should not be called.");
+      },
+    },
+  };
+
+  await assert.rejects(
+    streamText(mockClient, "Explain streaming"),
+    { message: "A text callback is required." }
+  );
+});
+
+test("shows a helpful message when the streaming prompt is missing", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["index.js", "stream"],
+    {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        OPENAI_API_KEY: "your_api_key_here",
+      },
+    }
+  );
+
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /Please provide a prompt\. Example: node index\.js stream/
+  );
+});
+
+test("shows all supported commands for unknown commands", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["index.js", "unknown"],
+    {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        OPENAI_API_KEY: "your_api_key_here",
+      },
+    }
+  );
+
+  assert.equal(result.status, 1);
+  assert.match(
+    result.stderr,
+    /Unknown command\. Use "greet", "summarize", or "stream"\./
   );
 });
