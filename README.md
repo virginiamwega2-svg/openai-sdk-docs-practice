@@ -43,6 +43,8 @@ Replace the placeholder with a valid API key only if you intend to make a live A
 
 **Security:** Never commit your real API key to GitHub. Keep your `.env` file private.
 
+**If you haven't configured an API key:** You can still install dependencies and run the automated tests. Running `npm start` or the live summarization example requires a valid `OPENAI_API_KEY`. Without one, the application displays a missing API key message and exits.
+
 ### 3. Run the Tests
 
 Run the automated test suite:
