@@ -6,7 +6,7 @@ OpenAI Node.js SDK
 
 ## Goal
 
-Evaluate how easily a new developer can install the SDK, configure credentials, run a first request, and recover from common errors.
+Evaluate how easily a new developer can install the SDK, configure credentials, run a first request, and recover from common errors. The audit focuses on onboarding clarity, documentation accuracy, troubleshooting, security, and verification against the actual implementation.
 
 ## Finding 1: Installation
 
@@ -14,7 +14,7 @@ Evaluate how easily a new developer can install the SDK, configure credentials, 
 
 **Assessment:** Installing the SDK is a clear starting point, but a complete example also needs project setup instructions and all required dependencies.
 
-**Recommended improvement:** Provide a beginner-friendly QuickStart that covers project setup, dependency installation, configuration, and running the first example.
+**Recommended improvement:** Provide a beginner-friendly QuickStart covering project setup, dependency installation, configuration, and running the first example.
 
 **Status:** Implemented in `QUICKSTART.md`.
 
@@ -24,9 +24,9 @@ Evaluate how easily a new developer can install the SDK, configure credentials, 
 
 **Potential developer impact:** A new developer may understand the code but still struggle to get the example running.
 
-**Improvement implemented:** Created `QUICKSTART.md` with project setup instructions, dependency installation, a complete `index.js` example, the `npm start` command, expected behavior, troubleshooting guidance, and official references.
+**Improvement implemented:** Created `QUICKSTART.md` with project setup instructions, dependency installation, an example using `index.js`, the `npm start` command, expected behavior, troubleshooting guidance, and official references.
 
-**Verification completed:** Cloned the published GitHub repository into a clean folder and tested the setup process. `npm install` succeeded with zero vulnerabilities reported, `npm test` passed all six tests, and `npm start` displayed the expected missing-API-key message.
+**Initial verification:** Cloned the published GitHub repository into a clean folder and tested the setup process. `npm install` succeeded with zero vulnerabilities reported at the time. The test suite in that version passed six tests, and `npm start` displayed the expected missing-API-key message.
 
 **Additional verification:** Reviewed the QuickStart against the actual project files and observed behavior. The documented installation command, API key instructions, test command, and supporting files were confirmed. The guide clearly states that a successful live API request has not been verified.
 
@@ -40,9 +40,11 @@ Evaluate how easily a new developer can install the SDK, configure credentials, 
 
 **Improvement implemented:** Added a preflight check that detects a missing or placeholder API key, displays a helpful message, and stops before making an API request.
 
-**Verification completed:** Ran `npm start` with the placeholder API key and confirmed that the expected message appeared:
+**Verification completed:** Ran `npm start` with the placeholder API key and confirmed that the following message appeared:
 
-`Missing API key. Add a valid OPENAI_API_KEY to your .env file.`
+```text
+Missing API key. Add a valid OPENAI_API_KEY to your .env file.
+```
 
 The process exited with status code `1`. No API request was made.
 
@@ -98,9 +100,9 @@ The process exited with status code `1`. No API request was made.
 
 **Potential developer impact:** Developers using a runtime outside the SDK's documented support range may encounter compatibility issues or use an environment that is not officially supported.
 
-**Verification completed:** Inspected the SDK package's declared Node.js requirement and tested the project using Node.js `v24.21.0` through `npx`. All six automated tests passed in that runtime.
+**Initial verification:** Inspected the SDK package's declared Node.js requirement and tested the project using Node.js `v24.21.0` through `npx`. All six automated tests passed in that earlier test run.
 
-**Assessment:** The project has passed the available automated tests under Node.js `v24.21.0`. This confirms the tested workflow, but does not establish compatibility with every supported runtime or verify a successful live API request.
+**Assessment:** The project passed the available automated tests under Node.js `v24.21.0`. This confirms the tested workflow, but does not establish compatibility with every supported runtime or verify a successful live API request.
 
 **Recommended improvement:** Keep the QuickStart linked to the official runtime requirements and repeat compatibility checks when the supported runtime range or project dependencies change.
 
@@ -110,22 +112,28 @@ The process exited with status code `1`. No API request was made.
 
 **Improvement implemented:** Configured `npm test` to use Node.js's built-in test runner and added `index.test.js`.
 
-**Verification completed:** All six automated tests passed in a fresh clone of the published repository.
+**Initial verification:** All six automated tests passed in a fresh clone of the published repository at that stage of development.
 
-The tests cover:
+The current test suite covers:
 
 1. Missing or placeholder API key.
-2. Authentication errors.
-3. Permission errors.
-4. Rate-limit or quota errors.
-5. Connection errors.
-6. Unknown errors.
+2. Missing summarization input.
+3. Unknown CLI commands.
+4. Authentication errors.
+5. Permission errors.
+6. Rate-limit errors.
+7. Connection errors.
+8. Unknown errors.
+9. Successful greeting responses using a mock SDK response.
+10. Successful summarization responses using a mock SDK response.
+11. Rejection of empty summarization text.
+12. Rejection of whitespace-only summarization text.
 
-**Latest verification:** After polishing `QUICKSTART.md`, ran `npm test` again. All six tests passed, with zero failures, skipped tests, or cancellations.
+**Latest verification — October 15, 2026:** Ran `npm test`. All 12 automated tests passed, with zero failures, skipped tests, or cancellations.
 
-**Developer impact:** Developers can verify the missing-key failure path and error-handling behavior without making a live API request or needing a paid API key.
+**Developer impact:** Developers can verify CLI validation, missing-key behavior, SDK error handling, and successful response handling without making a live API request or needing a paid API key for these tests.
 
-**Limitation:** These tests do not establish that a successful live SDK request works or that the project is compatible with every supported Node.js runtime.
+**Limitation:** Successful greeting and summarization tests use mocked SDK responses. They do not establish that a real OpenAI API request succeeds or that the project is compatible with every supported Node.js runtime.
 
 ## Finding 7: First-Time-User QuickStart Audit
 
@@ -135,57 +143,70 @@ The tests cover:
 
 The following checks were completed:
 
-* Confirmed that the documented dependency installation command works.
-* Confirmed that the API key instructions accurately describe the missing-key safeguard.
-* Confirmed that the documented `npm test` command runs successfully.
-* Confirmed that the required supporting files are present.
-* Confirmed that the guide clearly identifies the live API request as unverified.
+- Confirmed that the documented dependency installation command works.
+- Confirmed that the API key instructions accurately describe the missing-key safeguard.
+- Confirmed that the documented `npm test` command runs successfully.
+- Confirmed that the required supporting files are present.
+- Confirmed that the guide clearly identifies the live API request as unverified.
+- Confirmed that `error-handler.js` exports `getErrorMessage`.
+- Confirmed that `index.js` exports `generateGreeting` and `summarizeText`.
+- Confirmed that the documented CLI commands match the implementation, including the default greeting command and the summarization command.
+- Confirmed that the implementation provides clear validation messages for unknown commands and missing summarization input.
+- Searched the actual QuickStart file for the suspicious malformed Markdown link pattern `]((`; no match was found. This check does not validate every link destination or the rendered page.
+- Reran `npm test` on October 15, 2026; all 12 tests passed.
 
-**Assessment:** The QuickStart reflects the verified local setup and testing workflow. It distinguishes local verification from successful communication with the OpenAI API.
+**Assessment:** The QuickStart reflects the verified local setup and testing workflow. Its main code references and CLI commands match the implementation. It distinguishes local verification from successful communication with the OpenAI API.
 
 **Remaining limitations:**
 
-* A successful live API request has not been verified.
-* Access to the configured model and valid API credentials has not been confirmed.
-* An independent developer has not yet completed the QuickStart test.
+- A successful live API request has not been verified.
+- Access to valid API credentials and the configured model has not been confirmed.
+- An independent developer has not yet completed the QuickStart test.
+- The full rendered documentation and every external link have not been independently validated.
 
 ## Remaining Verification
 
-* [x] Verified the SDK package's Node.js requirement and tested the project using Node.js `v24.21.0`; all six automated tests passed.
-* [ ] Confirm valid API credentials, account access, and model availability before making a live API request.
-* [ ] Verify a successful live API request using valid OpenAI API credentials.
-* [ ] Ask an independent developer to follow the QuickStart without additional guidance and document any friction or points of confusion.
+- [x] Verified the SDK package's Node.js requirement and tested the project using Node.js `v24.21.0`; six tests passed in that earlier version.
+- [x] Reran the current test suite on October 15, 2026; all 12 tests passed.
+- [x] Compared the QuickStart's main code references and CLI commands against the implementation.
+- [ ] Confirm valid API credentials, account access, and model availability before making a live API request.
+- [ ] Verify a successful live API request using valid OpenAI API credentials.
+- [ ] Ask an independent developer to follow the QuickStart without additional guidance and document any friction or points of confusion.
+- [ ] Review the rendered Markdown and verify the official reference links.
 
 ## Completed Work
 
-* Fresh-clone installation and setup verification.
-* Six passing automated tests.
-* Missing-API-key behavior verification.
-* QuickStart review against observed local behavior.
-* Local credential-safety checks.
-* First-time-user documentation audit.
-* Node.js `v24.21.0` automated test run.
+- Fresh-clone installation and setup verification.
+- Missing-API-key behavior verification.
+- Local credential-safety checks.
+- QuickStart review against observed local behavior.
+- First-time-user documentation audit.
+- Node.js `v24.21.0` automated test run.
+- Expanded automated test suite with 12 passing tests.
+- Verification of QuickStart code references and CLI commands.
+- Verification that the current local test workflow passes without requiring a live API request.
 
 ## Current Assessment
 
 The practice project provides practical evidence of SDK onboarding, troubleshooting, automated testing, and technical documentation work.
 
-It includes a working missing-credential safeguard, six passing automated tests, and a QuickStart guide reviewed against actual local behavior and a fresh-clone workflow.
+It includes a missing-credential safeguard, 12 passing automated tests, and a QuickStart guide reviewed against the actual implementation and previously observed setup behavior.
 
-The documentation audit confirms that the documented installation, configuration, and testing instructions align with the checks performed so far. The project has also passed its automated tests under Node.js `v24.21.0`.
-
-The complete onboarding journey has not yet been independently validated. A successful live API request and an independent QuickStart test remain outstanding.
+The documentation audit distinguishes verified local behavior from unverified live API access. The current automated tests confirm CLI validation, error handling, and mocked successful SDK responses. They do not prove that a real API request succeeds.
 
 The official documentation review identified potential friction points based on my own experience. These should be validated with an independent developer before being described as confirmed documentation defects.
+
+The onboarding process has not yet been independently validated from beginning to end. A successful live API request and an independent QuickStart test remain outstanding.
 
 ## Next Steps
 
 1. Arrange an independent QuickStart test and record the developer's feedback.
 2. Verify a successful live API request when valid credentials and model access are available.
-3. Update this audit with the results of each additional verification.
+3. Review the rendered Markdown and verify the official reference links.
+4. Update this audit with the results of each additional verification.
 
 ## Official References
 
-* [OpenAI Node.js SDK repository](https://github.com/openai/openai-node)
-* [OpenAI API Quickstart](https://developers.openai.com/api/docs/quickstart)
-* [OpenAI Node.js SDK authentication guide](https://github.com/openai/openai-node/blob/main/docs/authentication.md)
+- [OpenAI Node.js SDK repository](https://github.com/openai/openai-node)
+- [OpenAI API Quickstart](https://developers.openai.com/api/docs/quickstart)
+- [OpenAI Node.js SDK authentication guide](https://github.com/openai/openai-node/blob/main/docs/authentication.md)
