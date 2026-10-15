@@ -327,3 +327,20 @@ test("shows all supported commands for unknown commands", () => {
     /Unknown command\. Use "greet", "summarize", or "stream"\./
   );
 });
+
+test("propagates an SDK error when streaming fails to start", async () => {
+  const sdkError = new Error("SDK request failed");
+
+  const mockClient = {
+    responses: {
+      create: async () => {
+        throw sdkError;
+      },
+    },
+  };
+
+  await assert.rejects(
+    streamText(mockClient, "Explain streaming", () => {}),
+    (error) => error === sdkError
+  );
+});
