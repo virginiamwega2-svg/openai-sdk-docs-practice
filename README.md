@@ -121,21 +121,27 @@ This project treats documentation as an essential part of the developer experien
 
 ## Continuous Integration
 
-This project uses GitHub Actions to run the automated test suite whenever changes are pushed to the repository or a pull request is opened.
+This project uses GitHub Actions to verify code behavior and documentation quality whenever changes are pushed to the repository or a pull request is opened.
 
-The workflow:
+The workflow performs two checks:
 
-* Checks out the repository.
-* Sets up Node.js 22.
-* Installs dependencies using `npm ci`.
-* Runs the automated tests using `npm test`.
+- **Automated tests:** Runs `npm test` to verify application behavior and catch regressions.
+- **Documentation link check:** Runs `npm run check:docs` to identify broken local Markdown links and links that point outside the project directory.
 
-This helps verify the project’s behavior consistently and catch regressions as the code evolves.
+### Run the checks locally
 
-**Local verification:**
+Run the automated tests:
 
 ```bash
 npm test
 ```
+
+Check local documentation links:
+
+```bash
+npm run check:docs
+```
+
+Both checks should pass before changes are pushed.
 
 **Workflow:** `.github/workflows/tests.yml`
