@@ -1,3 +1,4 @@
+import { withObservability } from "./observability.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -131,8 +132,10 @@ test("returns a generic message for unknown errors", () => {
 
 // Successful SDK response tests using mocks
 
-test("returns the greeting from a successful SDK response", async () => {
+
+test("returns the greeting and records a success metric", async () => {
   const expectedGreeting = "Hello, developer!";
+  const metrics = [];
 
   const mockClient = {
     responses: {
@@ -142,13 +145,21 @@ test("returns the greeting from a successful SDK response", async () => {
     },
   };
 
-  const greeting = await generateGreeting(mockClient);
-
+   const greeting = await generateGreeting(
+    mockClient,
+    (metric) => metrics.push(metric)
+  );
   assert.equal(greeting, expectedGreeting);
+  assert.equal(metrics.length, 1);
+  assert.equal(metrics[0].operation, "generateGreeting");
+  assert.equal(metrics[0].status, "success");
+  assert.equal(typeof metrics[0].durationMs, "number");
+  assert.ok(metrics[0].durationMs >= 0);
 });
 
-test("returns a summary from a successful SDK response", async () => {
-  const expectedSummary = "AI makes it easier to summarize text.";
+test("returns a summary and records a success metric", async () => {
+  const expectedSummary = "This is a summary.";
+  const metrics = [];
 
   const mockClient = {
     responses: {
@@ -160,15 +171,19 @@ test("returns a summary from a successful SDK response", async () => {
 
   const summary = await summarizeText(
     mockClient,
-    "Artificial intelligence can help developers summarize long documents."
+    "Text to summarize",
+    (metric) => metrics.push(metric)
   );
 
   assert.equal(summary, expectedSummary);
+  assert.equal(metrics.length, 1);
+  assert.equal(metrics[0].operation, "summarizeText");
+  assert.equal(metrics[0].status, "success");
+  assert.equal(typeof metrics[0].durationMs, "number");
+  assert.ok(metrics[0].durationMs >= 0);
 });
 
-// Input validation tests
-
-test("rejects empty text without calling the SDK", async () => {
+  test("rejects empty text without calling the SDK", async () => {
   const mockClient = {
     responses: {
       create: async () => {
@@ -204,8 +219,10 @@ test("rejects whitespace-only text without calling the SDK", async () => {
 
  // Streaming SDK tests using mocked events
 
-test("streams text fragments in order", async () => {
+
+test("streams text fragments in order and records a success metric", async () => {
   const receivedText = [];
+  const metrics = [];
 
   const events = [
     { type: "response.output_text.delta", delta: "Hello" },
@@ -226,14 +243,20 @@ test("streams text fragments in order", async () => {
     },
   };
 
-  await streamText(mockClient, "Greet a developer", (text) => {
-    receivedText.push(text);
-  });
+  await streamText(
+    mockClient,
+    "Say hello",
+    (chunk) => receivedText.push(chunk),
+    (metric) => metrics.push(metric)
+  );
 
   assert.deepEqual(receivedText, ["Hello", ", developer!"]);
-  assert.equal(receivedText.join(""), "Hello, developer!");
+  assert.equal(metrics.length, 1);
+  assert.equal(metrics[0].operation, "streamText");
+  assert.equal(metrics[0].status, "success");
+  assert.equal(typeof metrics[0].durationMs, "number");
+  assert.ok(metrics[0].durationMs >= 0);
 });
-
 test("ignores non-text streaming events", async () => {
   const receivedText = [];
 
@@ -328,8 +351,10 @@ test("shows all supported commands for unknown commands", () => {
   );
 });
 
-test("propagates an SDK error when streaming fails to start", async () => {
+
+test("records a streaming error and propagates the original SDK error", async () => {
   const sdkError = new Error("SDK request failed");
+  const metrics = [];
 
   const mockClient = {
     responses: {
@@ -340,7 +365,87 @@ test("propagates an SDK error when streaming fails to start", async () => {
   };
 
   await assert.rejects(
-    streamText(mockClient, "Explain streaming", () => {}),
+    streamText(
+      mockClient,
+      "Explain streaming",
+      () => {},
+      (metric) => metrics.push(metric)
+    ),
     (error) => error === sdkError
+  );
+
+  assert.equal(metrics.length, 1);
+  assert.equal(metrics[0].operation, "streamText");
+  assert.equal(metrics[0].status, "error");
+  assert.equal(typeof metrics[0].durationMs, "number");
+  assert.ok(metrics[0].durationMs >= 0);
+});
+
+
+test("records duration and success for a successful operation", async () => {
+  const metrics = [];
+
+  const result = await withObservability(
+    "testOperation",
+    async () => "hello",
+    (metric) => metrics.push(metric)
+  );
+
+  assert.equal(result, "hello");
+  assert.equal(metrics.length, 1);
+  assert.equal(metrics[0].operation, "testOperation");
+  assert.equal(metrics[0].status, "success");
+  assert.equal(typeof metrics[0].durationMs, "number");
+  assert.ok(metrics[0].durationMs >= 0);
+});
+
+test("records an error and rethrows when an operation fails", async () => {
+  const metrics = [];
+  const expectedError = new Error("Test failure");
+
+  await assert.rejects(
+    withObservability(
+      "testOperation",
+      async () => {
+        throw expectedError;
+      },
+      (metric) => metrics.push(metric)
+    ),
+    (error) => error === expectedError
+  );
+
+  assert.equal(metrics.length, 1);
+  assert.equal(metrics[0].operation, "testOperation");
+  assert.equal(metrics[0].status, "error");
+  assert.equal(typeof metrics[0].durationMs, "number");
+  assert.ok(metrics[0].durationMs >= 0);
+});
+
+test("preserves a successful result when the metrics callback fails", async () => {
+  const result = await withObservability(
+    "testOperation",
+    async () => "operation succeeded",
+    () => {
+      throw new Error("Metrics callback failed");
+    }
+  );
+
+  assert.equal(result, "operation succeeded");
+});
+
+test("preserves the original operation error when the metrics callback fails", async () => {
+  const operationError = new Error("Original operation failed");
+
+  await assert.rejects(
+    withObservability(
+      "testOperation",
+      async () => {
+        throw operationError;
+      },
+      () => {
+        throw new Error("Metrics callback failed");
+      }
+    ),
+    (error) => error === operationError
   );
 });

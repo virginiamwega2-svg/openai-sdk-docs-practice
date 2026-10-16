@@ -1,4 +1,4 @@
-
+import { withObservability } from "./observability.js";
 import "dotenv/config";
 import OpenAI from "openai";
 import { resolve } from "node:path";
@@ -7,29 +7,52 @@ import { getErrorMessage } from "./error-handler.js";
 
 const MODEL = "gpt-5.5";
 
-export async function generateGreeting(client) {
-  const response = await client.responses.create({
-    model: MODEL,
-    input: "Write a friendly one-sentence greeting.",
-  });
 
-  return response.output_text;
+export async function generateGreeting(client, onMetric = console.log) {
+  return withObservability(
+    "generateGreeting",
+    async () => {
+      const response = await client.responses.create({
+        model: MODEL,
+        input: "Write a friendly one-sentence greeting.",
+      });
+
+      return response.output_text;
+    },
+    onMetric
+  );
 }
 
-export async function summarizeText(client, text) {
+export async function summarizeText(
+  client,
+  text,
+  onMetric = console.log
+) {
   if (typeof text !== "string" || !text.trim()) {
     throw new Error("Text to summarize is required.");
   }
 
-  const response = await client.responses.create({
-    model: MODEL,
-    input: `Summarize the following text clearly and concisely:\n\n${text}`,
-  });
+  return withObservability(
+    "summarizeText",
+    async () => {
+      const response = await client.responses.create({
+        model: MODEL,
+        input: `Summarize the following text clearly and concisely:\n\n${text}`,
+      });
 
-  return response.output_text;
+      return response.output_text;
+    },
+    onMetric
+  );
 }
 
-export async function streamText(client, prompt, onText) {
+
+export async function streamText(
+  client,
+  prompt,
+  onText,
+  onMetric = console.log
+) {
   if (typeof prompt !== "string" || !prompt.trim()) {
     throw new Error("Prompt is required.");
   }
@@ -38,18 +61,25 @@ export async function streamText(client, prompt, onText) {
     throw new Error("A text callback is required.");
   }
 
-  const stream = await client.responses.create({
-    model: MODEL,
-    input: prompt,
-    stream: true,
-  });
+  return withObservability(
+    "streamText",
+    async () => {
+      const stream = await client.responses.create({
+        model: MODEL,
+        input: prompt,
+        stream: true,
+      });
 
-  for await (const event of stream) {
-    if (event.type === "response.output_text.delta") {
-      onText(event.delta);
-    }
-  }
+      for await (const event of stream) {
+        if (event.type === "response.output_text.delta") {
+          onText(event.delta);
+        }
+      }
+    },
+    onMetric
+  );
 }
+
 
 async function main() {
   const [command = "greet", ...args] = process.argv.slice(2);
