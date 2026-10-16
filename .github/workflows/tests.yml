@@ -23,3 +23,6 @@ jobs:
 
       - name: Run automated tests
         run: npm test
+
+      - name: Check documentation links
+        run: npm run check:docs
