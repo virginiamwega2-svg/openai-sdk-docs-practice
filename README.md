@@ -13,6 +13,24 @@ A hands-on project exploring the developer experience of using the OpenAI JavaSc
 * Writing automated tests without making live API requests.
 * Improving developer documentation through practical testing and iteration.
 
+## Lightweight Operation Observability
+
+The project includes a lightweight `withObservability()` helper that records basic metrics for asynchronous operations.
+
+For each operation, it records:
+
+- **Operation:** The name of the operation being measured.
+- **Duration:** How long the operation takes, in milliseconds.
+- **Status:** Whether the operation succeeds or throws an error.
+
+The helper supports an optional metrics callback, allowing callers to customize how metrics are handled. By default, metrics are printed to the console.
+
+The helper also prevents a metrics callback failure from changing the operation's result or replacing its original error.
+
+**Current scope:** This is a lightweight, in-process helper. It does not provide persistent metric storage, distributed tracing, token usage or cost tracking, or production monitoring.
+
+The behavior is covered by automated tests that verify successful operations, failures, and metrics callback errors without making live API requests.
+
 ## Getting Started
 
 ### Prerequisites
