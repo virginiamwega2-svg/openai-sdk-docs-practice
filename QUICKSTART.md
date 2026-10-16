@@ -121,7 +121,7 @@ The example checks for a missing or placeholder API key before attempting a requ
 
 ## 5. Understand the Existing SDK Implementation
 
-If you are using the existing repository, you do not need to recreate `index.js`. The project already includes the CLI implementation, SDK integration, input validation, and error handling for the `greet` and `summarize` commands.
+If you are using the existing repository, you do not need to recreate `index.js`. The project already includes the CLI implementation, SDK integration, input validation, and error handling for the `greet`, `summarize`, and `stream` commands.
 
 Read the existing `index.js` to understand how the application initializes the OpenAI SDK, validates inputs, handles errors, and processes API responses.
 
@@ -206,7 +206,7 @@ If you are using the existing repository, these files should already be included
 
 ## 6. Run the Example
 
-This project supports two commands: `greet` and `summarize`.
+This project supports three commands: `greet`, `summarize`, and `stream`.
 
 ### Run the greeting example
 
@@ -240,6 +240,21 @@ node index.js summarize "Developer documentation helps developers understand and
 
 The program sends the supplied text to the configured model and prints the returned summary.
 
+### Run the streaming example
+
+To display generated text incrementally as the model produces it, run:
+
+```powershell
+node index.js stream "Explain how an API works"
+```
+
+The program writes text fragments to the terminal as they arrive, then prints a newline when streaming finishes.
+
+The streaming command requires a valid `OPENAI_API_KEY`, access to the configured model, and a working network connection.
+
+Local tests cover streaming behavior without requiring a live API request.
+If the prompt is missing, the program displays usage guidance and exits with a non-zero exit code.
+
 ### Understand input validation
 
 Try running the summarization command without text:
@@ -256,7 +271,7 @@ Try an unsupported command:
 node index.js unknown
 ```
 
-The program should explain that the supported commands are `greet` and `summarize`, then exit with a non-zero exit code.
+The program should explain that the supported commands are `greet`, `summarize`, and `stream`, then exit with a non-zero exit code.
 
 ### API key and live execution
 
@@ -274,35 +289,29 @@ Run the local test suite:
 ```bash
 npm test
 ```
-The 12 tests cover:
+The **26 automated tests** cover:
 
-1. Missing API key handling.
-2. Missing text for the summarization command.
-3. Unsupported CLI commands.
-4. Authentication error handling.
-5. Permission error handling.
-6. Rate-limit error handling.
-7. Connection error handling.
-8. Unexpected error handling.
-9. Successful greeting with a mocked SDK response.
-10. Successful summarization with a mocked SDK response.
-11. Empty summarization input validation.
-12. Whitespace-only summarization input validation.
+- CLI validation and helpful error messages.
+- SDK error handling for authentication, permissions, rate limits, connection failures, and unexpected errors.
+- Mocked successful greeting and summarization requests.
+- Summarization input validation.
+- Streaming behavior, including text fragments, ignored non-text events, invalid inputs, and error propagation.
+- Observability metrics, including handling failures in the metrics callback.
+- Documentation link validation, including valid links, missing targets, and links that escape the project directory.
 
 The tests run locally without making live API requests.
 
 A successful run should report results equivalent to:
 
 ```text
-ℹ tests 12
-ℹ pass 12
+ℹ tests 26
+ℹ pass 26
 ℹ fail 0
 ```
 
 The exact output format may vary by Node.js version.
 
-**Verified locally:** All 12 tests passed in the latest recorded test run. This confirms the tested local behavior, not the success of a live API request.
-
+**Verified locally:** All 26 tests passed in the latest recorded test run. This confirms the tested local behavior, not the success of a live API request.
 
 The successful-response test uses a mock client that returns a response-shaped object. It verifies how `generateGreeting()` handles that object; it does not verify the live OpenAI SDK, network connectivity, or model access.
 
@@ -385,7 +394,7 @@ You have completed the local setup and verification when you can:
 * Configure an API key without exposing it.
 * Run the example and understand its missing-key behavior.
 * Explain the difference between a local validation check, a mocked response, and a live API request.
-* Run all 12 automated tests successfully.
+* Run all 26 automated tests successfully.
 * Find guidance for common errors and understand the next troubleshooting step.
 
 A successful live API request additionally requires valid credentials, suitable permissions, access to the configured model, and working network connectivity. Live API success has not been verified as part of this practice project.
