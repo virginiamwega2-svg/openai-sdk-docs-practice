@@ -86,6 +86,7 @@ For input validation examples, see the [QuickStart Guide](./QUICKSTART.md).
 * [Troubleshooting Guide](./TROUBLESHOOTING.md) — Diagnose common issues and learn how to recover.
 * [Validation Report](./VALIDATION-REPORT.md) — Review the checks performed to verify documentation against the implementation.
 * [SDK Documentation Audit](./SDK-DOCUMENTATION-AUDIT.md) — Review documentation quality and opportunities to improve the developer experience.
+* [AI Observability Guide](./AI-OBSERVABILITY-GUIDE.md) — Learn about AI request tracing, latency, token usage, costs, streaming failures, evaluation, and privacy.
 
 
 ## Project Limitations
