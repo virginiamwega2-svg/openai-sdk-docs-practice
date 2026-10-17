@@ -100,6 +100,7 @@ For input validation examples, see the [QuickStart Guide](./QUICKSTART.md).
 ### 5. Explore the Documentation
 
 * [QuickStart Guide](./QUICKSTART.md) — Set up the project and run the example.
+* [API Reference](./API-REFERENCE.md) — Review the exported functions, parameters, return values, validation, and error behaviour.
 * [SDK Integration Guide](./SDK-INTEGRATION-GUIDE.md) — Understand how the OpenAI SDK is integrated and how the example works.
 * [Troubleshooting Guide](./TROUBLESHOOTING.md) — Diagnose common issues and learn how to recover.
 * [Validation Report](./VALIDATION-REPORT.md) — Review the checks performed to verify documentation against the implementation.
