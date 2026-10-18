@@ -104,15 +104,15 @@ Confirm that the request uses `stream: true` and that the application processes 
 
 ## Verification status
 
-At the time this cookbook was written:
+The latest local test run reported 26 passing tests and zero failures.
 
-- The streaming function was implemented in `index.js`.
+- The streaming function is implemented in `index.js`.
 - The CLI includes a `stream` command.
-- The automated test suite reported 18 passing tests and zero failures.
+- The automated test suite passed all 26 tests.
 - Streaming behavior was tested with mocked events.
-- A live API streaming request had not yet been verified.
+- A live API streaming request has not yet been verified.
 
-This distinction matters: passing mocked tests is evidence of application behavior under controlled conditions, not proof of successful live API integration.
+Passing mocked tests demonstrates application behavior under controlled conditions; it does not prove that a live API streaming request succeeds.
 
 ## Related project documentation
 
