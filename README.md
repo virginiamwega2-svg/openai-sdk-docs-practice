@@ -76,7 +76,7 @@ The local tests verify missing API key handling and error-message behavior witho
 
 ### 4. Run the Example
 
-The project supports two commands:
+The project supports three commands: `greet`, `summarize`, and `stream`.
 
 **Generate a greeting**
 
@@ -102,6 +102,7 @@ For input validation examples, see the [QuickStart Guide](./QUICKSTART.md).
 * [QuickStart Guide](./QUICKSTART.md) — Set up the project and run the example.
 * [API Reference](./API-REFERENCE.md) — Review the exported functions, parameters, return values, validation, and error behaviour.
 * [SDK Integration Guide](./SDK-INTEGRATION-GUIDE.md) — Understand how the OpenAI SDK is integrated and how the example works.
+* [Streaming Cookbook](./STREAMING-COOKBOOK.md) — Learn how to consume streamed text responses and run the streaming example.
 * [Troubleshooting Guide](./TROUBLESHOOTING.md) — Diagnose common issues and learn how to recover.
 * [Validation Report](./VALIDATION-REPORT.md) — Review the checks performed to verify documentation against the implementation.
 * [SDK Documentation Audit](./SDK-DOCUMENTATION-AUDIT.md) — Review documentation quality and opportunities to improve the developer experience.

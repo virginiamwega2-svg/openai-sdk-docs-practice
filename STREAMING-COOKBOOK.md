@@ -14,7 +14,7 @@ Before starting, make sure you have:
 
 - Node.js 22 or later.
 - npm installed.
-- The project dependencies installed with `npm install`.
+- The project dependencies installed with `npm ci`.
 - A valid OpenAI API key for live API testing.
 
 The automated tests use mocked streaming events and do not require a live API key.
