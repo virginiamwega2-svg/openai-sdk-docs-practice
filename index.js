@@ -8,7 +8,7 @@ import { performance } from "node:perf_hooks";
 const MODEL = "gpt-5.5";
 
 // Add token usage to an existing observability metric when available.
-function reportMetricsWithUsage(metric, usage, onMetric) {
+function reportMetricsWithUsage(metric, usage, onMetric, span) {
   const tokenMetrics = {};
 
   const inputTokens = usage?.input_tokens;
@@ -58,7 +58,44 @@ function reportMetricsWithUsage(metric, usage, onMetric) {
       estimatedCostUsd.toFixed(12)
     );
   }
+  if (span) {
+    if (Number.isFinite(inputTokens)) {
+      span.setAttribute("gen_ai.usage.input_tokens", inputTokens);
+    }
 
+    if (Number.isFinite(outputTokens)) {
+      span.setAttribute("gen_ai.usage.output_tokens", outputTokens);
+    }
+
+    if (Number.isFinite(totalTokens)) {
+      span.setAttribute("app.usage.total_tokens", totalTokens);
+    }
+
+    const reportedCachedTokens =
+      usage?.input_tokens_details?.cached_tokens;
+
+    if (
+      Number.isFinite(inputTokens) &&
+      Number.isFinite(reportedCachedTokens)
+    ) {
+      const cachedInputTokens = Math.min(
+        Math.max(reportedCachedTokens, 0),
+        inputTokens
+      );
+
+      span.setAttribute(
+        "gen_ai.usage.cache_read.input_tokens",
+        cachedInputTokens
+      );
+    }
+
+    if (Number.isFinite(tokenMetrics.estimatedCostUsd)) {
+      span.setAttribute(
+        "app.cost.estimated_usd",
+        tokenMetrics.estimatedCostUsd
+      );
+    }
+  }
   onMetric({
     ...metric,
     ...tokenMetrics,
@@ -81,7 +118,8 @@ function withResponseUsageMetrics(
 
       return response.output_text;
     },
-    (metric) => reportMetricsWithUsage(metric, usage, onMetric)
+        (metric, span) =>
+      reportMetricsWithUsage(metric, usage, onMetric, span)
   );
 }
 
@@ -168,7 +206,7 @@ export async function streamText(
         }
       }
     },
-    (metric) => {
+    (metric, span) => {
       const enrichedMetric = {
         ...metric,
         ...(timeToFirstTokenMs !== undefined
@@ -176,7 +214,7 @@ export async function streamText(
           : {}),
       };
 
-      reportMetricsWithUsage(enrichedMetric, usage, onMetric);
+      reportMetricsWithUsage(enrichedMetric, usage, onMetric, span);
     }
   );
 }

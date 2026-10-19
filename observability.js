@@ -41,16 +41,19 @@ export async function withObservability(
       span.setStatus({ code: SpanStatusCode.OK });
     }
 
-    span.end();
-
     try {
-      onMetric({
-        operation: operationName,
-        durationMs,
-        status,
-      });
+      onMetric(
+        {
+          operation: operationName,
+          durationMs,
+          status,
+        },
+        span
+      );
     } catch {
       // A metrics callback failure must not affect the operation.
     }
+
+    span.end();
   }
 }
