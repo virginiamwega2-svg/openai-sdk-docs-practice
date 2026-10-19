@@ -84,6 +84,18 @@ HTTP instrumentation, or verified distributed trace-context propagation.
 For more detail, see the
 [AI Observability Guide](./AI-OBSERVABILITY-GUIDE.md).
 
+## LLM Output Evaluation
+
+This project includes a small, rule-based evaluation workflow for
+testing summaries against predefined expectations.
+
+### Run the Evaluation Examples
+
+Run the evaluation runner:
+
+```bash
+npm run evaluate
+
 ## Getting Started
 
 ### Prerequisites

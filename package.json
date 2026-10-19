@@ -4,11 +4,12 @@
   "description": "A practical project for learning OpenAI SDK integration, error handling, testing, and AI developer documentation.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "node --test",
-    "check:docs": "node scripts/check-doc-links.js",
-    "test:otel": "node --import ./instrumentation.js ./otel-smoke.js"
-  },
+  "start": "node index.js",
+  "test": "node --test",
+  "check:docs": "node scripts/check-doc-links.js",
+  "test:otel": "node --import ./instrumentation.js ./otel-smoke.js",
+  "evaluate": "node evaluation-runner.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "launch-delay",
+    "summary": "The launch was postponed from May 10 to May 17 after a login issue was discovered and fixed on May 14. A regression test on May 15 is planned before confirming the release."
+  },
+  {
+    "id": "library-hours",
+    "summary": "Starting June 3, the library will offer extended hours on Tuesdays and Thursdays until 8 p.m. The change is an eight-week pilot. Visitor counts and staff feedback will inform whether it continues. Sunday opening hours will remain unchanged."
+  },
+  {
+    "id": "onboarding-survey",
+    "summary": "A voluntary survey included 120 users: 72 said the documentation was easy to follow, 30 were neutral, and 18 found it difficult. The results show an association but cannot establish that the documentation caused higher onboarding ratings. The survey did not measure task completion time."
+  }
+]

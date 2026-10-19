@@ -1,0 +1,53 @@
+[
+  {
+    "id": "launch-delay",
+    "description": "Check whether a summary preserves events and planned actions.",
+    "sourceText": "The team planned to launch its new application on May 10. During final testing, engineers discovered a login issue, so the launch was postponed to May 17. Engineers fixed the issue on May 14. The team plans to run another full regression test on May 15 before confirming the release. No customer data was lost.",
+    "requiredPhrases": [
+      "postponed from May 10 to May 17",
+      "login issue",
+      "fixed on May 14",
+      "regression test on May 15"
+    ],
+    "forbiddenPhrases": [
+      "the application has already launched",
+      "the application has no remaining bugs"
+    ]
+  },
+  {
+    "id": "library-hours",
+    "description": "Check whether a summary preserves important conditions and limits.",
+    "sourceText": "Riverside Public Library will extend its opening hours on Tuesdays and Thursdays until 8 p.m., starting June 3. Its usual closing time is 5 p.m. The change is an eight-week pilot. After the pilot, visitor counts and staff feedback will help the library decide whether to continue the extended hours. Sunday opening hours will remain unchanged.",
+    "requiredPhrases": [
+      "Tuesdays and Thursdays",
+      "until 8 p.m.",
+      "eight-week pilot",
+      "starting June 3",
+      "visitor counts",
+      "staff feedback",
+      "Sunday opening hours will remain unchanged"
+    ],
+    "forbiddenPhrases": [
+      "extended hours are permanent",
+      "the library now closes at 8 p.m. every day"
+    ]
+  },
+  {
+    "id": "onboarding-survey",
+    "description": "Check whether a summary handles evidence and uncertainty accurately.",
+    "sourceText": "A voluntary survey collected responses from 120 users. Of these, 72 said the documentation was easy to follow, 30 were neutral, and 18 found it difficult. Respondents who found the documentation easy to follow were more likely to give a positive onboarding rating. The survey did not measure task completion time and cannot establish that the documentation caused the higher ratings.",
+    "requiredPhrases": [
+      "voluntary survey",
+      "120 users",
+      "72 said the documentation was easy to follow",
+      "30 were neutral",
+      "18 found it difficult",
+      "cannot establish that the documentation caused"
+    ],
+    "forbiddenPhrases": [
+      "the survey proves that the documentation caused better onboarding",
+      "the results represent all users",
+      "the survey measured task completion time"
+    ]
+  }
+]
