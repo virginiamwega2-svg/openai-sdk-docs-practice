@@ -13,23 +13,76 @@ A hands-on project exploring the developer experience of using the OpenAI JavaSc
 * Writing automated tests without making live API requests.
 * Improving developer documentation through practical testing and iteration.
 
-## Lightweight Operation Observability
+## AI Observability and OpenTelemetry Tracing
 
-The project includes a lightweight `withObservability()` helper that records basic metrics for asynchronous operations.
+This project demonstrates lightweight AI operation observability and
+application-level tracing for OpenAI SDK examples.
 
-For each operation, it records:
+### Operation Metrics
 
-- **Operation:** The name of the operation being measured.
-- **Duration:** How long the operation takes, in milliseconds.
-- **Status:** Whether the operation succeeds or throws an error.
+The `withObservability()` helper records the operation name, duration in
+milliseconds, and success or error status. It also preserves the original
+operation result or error if the metrics callback fails.
 
-The helper supports an optional metrics callback, allowing callers to customize how metrics are handled. By default, metrics are printed to the console.
+The AI examples report additional measurements when the required usage
+information is available:
 
-The helper also prevents a metrics callback failure from changing the operation's result or replacing its original error.
+- **Token usage:** Input, output, and total tokens for greeting,
+  summarization, and streaming operations.
+- **Time to first token (TTFT):** The elapsed time from initiating a
+  streaming request until the first non-empty text delta arrives.
+- **Estimated cost:** A simplified USD estimate based on token usage and
+  the pricing assumptions configured in the code.
 
-**Current scope:** This is a lightweight, in-process helper. It does not provide persistent metric storage, distributed tracing, token usage or cost tracking, or production monitoring.
+Cost estimates are not guaranteed invoice totals and do not account for
+every possible pricing adjustment or additional charge.
 
-The behavior is covered by automated tests that verify successful operations, failures, and metrics callback errors without making live API requests.
+By default, operation metrics are printed to the console. The current
+implementation does not send these metrics to a persistent metrics backend.
+
+### OpenTelemetry Tracing
+
+The project uses OpenTelemetry to create application-level spans around
+operations wrapped by `withObservability()` when the SDK is initialized
+before the application.
+
+The `instrumentation.js` file configures a console span exporter and identifies
+the service as `openai-sdk-docs-practice`, version `1.0.0`.
+
+To run the tracing demonstration locally, execute:
+
+```powershell
+npm run test:otel
+```
+
+The demonstration uses a mocked OpenAI response. It prints the application
+metrics and exports a span named `generateGreeting`, including its trace ID,
+span ID, timing, status, and service attributes. It does not make a live API
+request or incur OpenAI API usage charges.
+
+To initialize tracing when running the application with a live API request,
+preload the instrumentation module:
+
+```powershell
+node --import ./instrumentation.js index.js
+```
+
+Live requests require a valid API key and the necessary API access. The
+application-level span records the wrapped operation, but the current setup
+does not automatically instrument the underlying OpenAI SDK HTTP request.
+
+### Verification and Limitations
+
+Automated tests use mocked SDK responses to verify application behavior,
+including token reporting, streaming timing, and cost estimation. Mocked tests
+do not establish live API performance, model availability, or actual billing.
+
+The current tracing setup exports spans to the console. It does not yet
+provide a production observability backend or dashboard, automatic OpenAI SDK
+HTTP instrumentation, or verified distributed trace-context propagation.
+
+For more detail, see the
+[AI Observability Guide](./AI-OBSERVABILITY-GUIDE.md).
 
 ## Getting Started
 

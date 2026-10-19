@@ -3,19 +3,25 @@
   "version": "1.0.0",
   "description": "A practical project for learning OpenAI SDK integration, error handling, testing, and AI developer documentation.",
   "main": "index.js",
- "scripts": {
+  "scripts": {
   "start": "node index.js",
   "test": "node --test",
-  "check:docs": "node scripts/check-doc-links.js"
+  "check:docs": "node scripts/check-doc-links.js",
+  "test:otel": "node --import ./instrumentation.js ./otel-smoke.js"
 },
   "keywords": [],
   "author": "",
   "license": "ISC",
-   "type": "module",
+  "type": "module",
   "engines": {
     "node": ">=22.0.0"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/resources": "^2.12.0",
+    "@opentelemetry/sdk-node": "^0.223.0",
+    "@opentelemetry/sdk-trace": "^2.12.0",
+    "@opentelemetry/semantic-conventions": "^1.43.0",
     "dotenv": "^18.0.7",
     "openai": "^7.31.0"
   }

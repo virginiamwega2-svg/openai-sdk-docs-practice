@@ -148,7 +148,13 @@ For distributed applications, trace context can be propagated between services s
 
 ### Important Limitation
 
-The workflow above is illustrative. It describes how an AI request could be traced; it does not claim that the accompanying project currently implements tracing, span collection, or distributed trace-context propagation.
+The accompanying project now implements application-level OpenTelemetry spans through the `withObservability()` wrapper when the SDK is initialized before the application using `--import ./instrumentation.js`.
+
+The `instrumentation.js` file configures a console span exporter. Running `npm run test:otel` verifies that a span can be generated and exported locally.
+
+This is a local tracing demonstration. The project does not yet export telemetry to a persistent observability backend or dashboard, automatically instrument OpenAI SDK HTTP requests, or demonstrate distributed trace-context propagation.
+
+The individual stages in the illustrative workflow above, such as input preparation and response processing, are not yet separately instrumented.
 
 ## 4. Troubleshooting Common Streaming Failures
 
@@ -408,7 +414,7 @@ The explanations and examples in this guide are educational documentation. They 
 In particular, documenting a practice does not establish that the project currently has:
 
 - A production observability backend or dashboard for durable metrics collection.
-- Distributed tracing or automatic span creation.
+- A production tracing backend or dashboard, automatic OpenAI SDK HTTP instrumentation, or distributed trace-context propagation.
 - Automated AI quality evaluations.
 - Automatic privacy redaction or sampling.
 - Enforced data-retention policies.
@@ -444,7 +450,7 @@ Verify current prices against the [official GPT-5.5 pricing documentation](https
 
 #### What Remains Unimplemented
 
-The project does not yet export telemetry to a production observability backend or provide dashboards. Distributed tracing and automatic span creation remain future work.
+The project creates application-level OpenTelemetry spans and exports them to the console when instrumentation is initialized before the application. Production telemetry export, dashboards, automatic OpenAI SDK HTTP instrumentation, and distributed trace-context propagation remain future work.
 
 Automated AI quality evaluation, automatic privacy redaction, configurable request sampling, and enforced data-retention policies are also not established as implemented capabilities.
 
