@@ -4,21 +4,98 @@ import OpenAI from "openai";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { getErrorMessage } from "./error-handler.js";
-
+import { performance } from "node:perf_hooks";
 const MODEL = "gpt-5.5";
 
+// Add token usage to an existing observability metric when available.
+function reportMetricsWithUsage(metric, usage, onMetric) {
+  const tokenMetrics = {};
 
-export async function generateGreeting(client, onMetric = console.log) {
+  const inputTokens = usage?.input_tokens;
+  const outputTokens = usage?.output_tokens;
+  const totalTokens = usage?.total_tokens;
+
+  if (Number.isFinite(inputTokens)) {
+    tokenMetrics.inputTokens = inputTokens;
+  }
+
+  if (Number.isFinite(outputTokens)) {
+    tokenMetrics.outputTokens = outputTokens;
+  }
+
+  if (Number.isFinite(totalTokens)) {
+    tokenMetrics.totalTokens = totalTokens;
+  }
+
+  // Standard GPT-5.5 text-token prices in USD per million tokens.
+  const pricing = {
+    input: 5,
+    cachedInput: 0.50,
+    output: 30,
+  };
+
+  if (
+    Number.isFinite(inputTokens) &&
+    inputTokens >= 0 &&
+    Number.isFinite(outputTokens) &&
+    outputTokens >= 0
+  ) {
+    const reportedCachedTokens =
+      usage?.input_tokens_details?.cached_tokens;
+
+    const cachedInputTokens = Number.isFinite(reportedCachedTokens)
+      ? Math.min(Math.max(reportedCachedTokens, 0), inputTokens)
+      : 0;
+
+    const uncachedInputTokens = inputTokens - cachedInputTokens;
+
+    const estimatedCostUsd =
+      (uncachedInputTokens * pricing.input) / 1_000_000 +
+      (cachedInputTokens * pricing.cachedInput) / 1_000_000 +
+      (outputTokens * pricing.output) / 1_000_000;
+
+    tokenMetrics.estimatedCostUsd = Number(
+      estimatedCostUsd.toFixed(12)
+    );
+  }
+
+  onMetric({
+    ...metric,
+    ...tokenMetrics,
+  });
+}
+
+// Shared wrapper for non-streaming Responses API operations.
+function withResponseUsageMetrics(
+  operationName,
+  request,
+  onMetric = console.log
+) {
+  let usage;
+
   return withObservability(
-    "generateGreeting",
+    operationName,
     async () => {
-      const response = await client.responses.create({
-        model: MODEL,
-        input: "Write a friendly one-sentence greeting.",
-      });
+      const response = await request();
+      usage = response.usage;
 
       return response.output_text;
     },
+    (metric) => reportMetricsWithUsage(metric, usage, onMetric)
+  );
+}
+
+export async function generateGreeting(
+  client,
+  onMetric = console.log
+) {
+  return withResponseUsageMetrics(
+    "generateGreeting",
+    () =>
+      client.responses.create({
+        model: MODEL,
+        input: "Write a friendly one-sentence greeting.",
+      }),
     onMetric
   );
 }
@@ -32,20 +109,16 @@ export async function summarizeText(
     throw new Error("Text to summarize is required.");
   }
 
-  return withObservability(
+  return withResponseUsageMetrics(
     "summarizeText",
-    async () => {
-      const response = await client.responses.create({
+    () =>
+      client.responses.create({
         model: MODEL,
         input: `Summarize the following text clearly and concisely:\n\n${text}`,
-      });
-
-      return response.output_text;
-    },
+      }),
     onMetric
   );
 }
-
 
 export async function streamText(
   client,
@@ -61,9 +134,14 @@ export async function streamText(
     throw new Error("A text callback is required.");
   }
 
+  let usage;
+  let timeToFirstTokenMs;
+
   return withObservability(
     "streamText",
     async () => {
+      const requestStartedAt = performance.now();
+
       const stream = await client.responses.create({
         model: MODEL,
         input: prompt,
@@ -72,15 +150,36 @@ export async function streamText(
 
       for await (const event of stream) {
         if (event.type === "response.output_text.delta") {
+          if (
+            timeToFirstTokenMs === undefined &&
+            typeof event.delta === "string" &&
+            event.delta.length > 0
+          ) {
+            timeToFirstTokenMs = Number(
+              (performance.now() - requestStartedAt).toFixed(2)
+            );
+          }
+
           onText(event.delta);
+        }
+
+        if (event.type === "response.completed") {
+          usage = event.response?.usage;
         }
       }
     },
-    onMetric
+    (metric) => {
+      const enrichedMetric = {
+        ...metric,
+        ...(timeToFirstTokenMs !== undefined
+          ? { timeToFirstTokenMs }
+          : {}),
+      };
+
+      reportMetricsWithUsage(enrichedMetric, usage, onMetric);
+    }
   );
 }
-
-
 async function main() {
   const [command = "greet", ...args] = process.argv.slice(2);
 

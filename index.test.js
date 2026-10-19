@@ -4,14 +4,9 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import OpenAI from "openai";
 import { getErrorMessage } from "./error-handler.js";
-import {
-  generateGreeting,
-  summarizeText,
-  streamText,
-} from "./index.js";
+import {generateGreeting,summarizeText,streamText,} from "./index.js";
 
 // CLI validation tests
-
 test("shows a helpful error when the API key is missing", () => {
   const result = spawnSync(process.execPath, ["index.js"], {
     encoding: "utf8",
@@ -132,7 +127,6 @@ test("returns a generic message for unknown errors", () => {
 
 // Successful SDK response tests using mocks
 
-
 test("returns the greeting and records a success metric", async () => {
   const expectedGreeting = "Hello, developer!";
   const metrics = [];
@@ -141,23 +135,40 @@ test("returns the greeting and records a success metric", async () => {
     responses: {
       create: async () => ({
         output_text: expectedGreeting,
+        usage: {
+          input_tokens: 12,
+          input_tokens_details: {
+            cached_tokens: 2,
+          },
+          output_tokens: 8,
+          total_tokens: 20,
+        },
       }),
     },
   };
 
-   const greeting = await generateGreeting(
+  const greeting = await generateGreeting(
     mockClient,
     (metric) => metrics.push(metric)
   );
+
   assert.equal(greeting, expectedGreeting);
   assert.equal(metrics.length, 1);
   assert.equal(metrics[0].operation, "generateGreeting");
   assert.equal(metrics[0].status, "success");
   assert.equal(typeof metrics[0].durationMs, "number");
   assert.ok(metrics[0].durationMs >= 0);
+
+  assert.equal(metrics[0].inputTokens, 12);
+  assert.equal(metrics[0].outputTokens, 8);
+  assert.equal(metrics[0].totalTokens, 20);
+
+  assert.ok(
+    Math.abs(metrics[0].estimatedCostUsd - 0.000291) < 1e-12
+  );
 });
 
-test("returns a summary and records a success metric", async () => {
+test("returns a summary and records token usage metrics", async () => {
   const expectedSummary = "This is a summary.";
   const metrics = [];
 
@@ -165,6 +176,11 @@ test("returns a summary and records a success metric", async () => {
     responses: {
       create: async () => ({
         output_text: expectedSummary,
+        usage: {
+          input_tokens: 30,
+          output_tokens: 10,
+          total_tokens: 40,
+        },
       }),
     },
   };
@@ -179,8 +195,9 @@ test("returns a summary and records a success metric", async () => {
   assert.equal(metrics.length, 1);
   assert.equal(metrics[0].operation, "summarizeText");
   assert.equal(metrics[0].status, "success");
-  assert.equal(typeof metrics[0].durationMs, "number");
-  assert.ok(metrics[0].durationMs >= 0);
+  assert.equal(metrics[0].inputTokens, 30);
+  assert.equal(metrics[0].outputTokens, 10);
+  assert.equal(metrics[0].totalTokens, 40);
 });
 
   test("rejects empty text without calling the SDK", async () => {
@@ -218,16 +235,23 @@ test("rejects whitespace-only text without calling the SDK", async () => {
 });
 
  // Streaming SDK tests using mocked events
-
-
-test("streams text fragments in order and records a success metric", async () => {
+test("streams text fragments in order and records token usage metrics", async () => {
   const receivedText = [];
   const metrics = [];
 
   const events = [
     { type: "response.output_text.delta", delta: "Hello" },
     { type: "response.output_text.delta", delta: ", developer!" },
-    { type: "response.completed" },
+    {
+      type: "response.completed",
+      response: {
+        usage: {
+          input_tokens: 25,
+          output_tokens: 9,
+          total_tokens: 34,
+        },
+      },
+    },
   ];
 
   const mockClient = {
@@ -256,7 +280,14 @@ test("streams text fragments in order and records a success metric", async () =>
   assert.equal(metrics[0].status, "success");
   assert.equal(typeof metrics[0].durationMs, "number");
   assert.ok(metrics[0].durationMs >= 0);
+  assert.equal(typeof metrics[0].timeToFirstTokenMs, "number");
+assert.ok(metrics[0].timeToFirstTokenMs >= 0);
+
+  assert.equal(metrics[0].inputTokens, 25);
+  assert.equal(metrics[0].outputTokens, 9);
+  assert.equal(metrics[0].totalTokens, 34);
 });
+
 test("ignores non-text streaming events", async () => {
   const receivedText = [];
 
