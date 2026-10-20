@@ -1,130 +1,72 @@
 # OpenAI SDK Documentation Practice
+
 [![Run Tests](https://github.com/virginiamwega2-svg/openai-sdk-docs-practice/actions/workflows/tests.yml/badge.svg)](https://github.com/virginiamwega2-svg/openai-sdk-docs-practice/actions/workflows/tests.yml)
 
+A hands-on project exploring **AI Developer Experience (DevEx)** through OpenAI SDK integration, developer documentation, automated testing, observability, and LLM evaluation.
 
-A hands-on project exploring the developer experience of using the OpenAI JavaScript SDK. It focuses on developer onboarding, secure API key configuration, error handling, troubleshooting, and automated testing.
+The goal is to make AI integrations easier to understand, test, debug, and evaluate.
 
 ## What This Project Demonstrates
 
-* Setting up a Node.js project with the OpenAI JavaScript SDK.
-* Managing environment variables securely with `dotenv`.
-* Making requests using the OpenAI Responses API.
-* Providing clear, actionable error messages for common failures.
-* Writing automated tests without making live API requests.
-* Improving developer documentation through practical testing and iteration.
+- **SDK integration:** Working with the OpenAI JavaScript SDK and Responses API.
+- **Developer experience:** Clear onboarding instructions, input validation, and actionable error messages.
+- **Automated testing:** Testing application behavior with mocked API responses.
+- **AI observability:** Recording operation duration, token usage, estimated cost, streaming timing, and OpenTelemetry spans.
+- **LLM evaluation:** Evaluating sample summaries against predefined phrase checks.
+- **Pairwise evaluation:** Comparing candidate summaries against reference judgments and measuring agreement.
+- **Documentation quality:** Maintaining practical guides and checking local Markdown links.
 
-## AI Observability and OpenTelemetry Tracing
-
-This project demonstrates lightweight AI operation observability and
-application-level tracing for OpenAI SDK examples.
-
-### Operation Metrics
-
-The `withObservability()` helper records the operation name, duration in
-milliseconds, and success or error status. It also preserves the original
-operation result or error if the metrics callback fails.
-
-The AI examples report additional measurements when the required usage
-information is available:
-
-- **Token usage:** Input, output, and total tokens for greeting,
-  summarization, and streaming operations.
-- **Time to first token (TTFT):** The elapsed time from initiating a
-  streaming request until the first non-empty text delta arrives.
-- **Estimated cost:** A simplified USD estimate based on token usage and
-  the pricing assumptions configured in the code.
-
-Cost estimates are not guaranteed invoice totals and do not account for
-every possible pricing adjustment or additional charge.
-
-By default, operation metrics are printed to the console. The current
-implementation does not send these metrics to a persistent metrics backend.
-
-### OpenTelemetry Tracing
-
-The project uses OpenTelemetry to create application-level spans around
-operations wrapped by `withObservability()` when the SDK is initialized
-before the application.
-
-The `instrumentation.js` file configures a console span exporter and identifies
-the service as `openai-sdk-docs-practice`, version `1.0.0`.
-
-To run the tracing demonstration locally, execute:
-
-```powershell
-npm run test:otel
-```
-
-The demonstration uses a mocked OpenAI response. It prints the application
-metrics and exports a span named `generateGreeting`, including its trace ID,
-span ID, timing, status, and service attributes. It does not make a live API
-request or incur OpenAI API usage charges.
-
-To initialize tracing when running the application with a live API request,
-preload the instrumentation module:
-
-```powershell
-node --import ./instrumentation.js index.js
-```
-
-Live requests require a valid API key and the necessary API access. The
-application-level span records the wrapped operation, but the current setup
-does not automatically instrument the underlying OpenAI SDK HTTP request.
-
-### Verification and Limitations
-
-Automated tests use mocked SDK responses to verify application behavior,
-including token reporting, streaming timing, and cost estimation. Mocked tests
-do not establish live API performance, model availability, or actual billing.
-
-The current tracing setup exports spans to the console. It does not yet
-provide a production observability backend or dashboard, automatic OpenAI SDK
-HTTP instrumentation, or verified distributed trace-context propagation.
-
-For more detail, see the
-[AI Observability Guide](./AI-OBSERVABILITY-GUIDE.md).
-
-## LLM Output Evaluation
-
-This project includes a small, rule-based evaluation workflow for
-testing summaries against predefined expectations.
-
-### Run the Evaluation Examples
-
-Run the evaluation runner:
-
-```bash
-npm run evaluate
-
-## Pairwise LLM Evaluation
-
-This project includes a prototype workflow for comparing two
-candidate summaries against a human reference judgment.
-
-### Run the Pairwise Benchmark
-
-```bash
-npm run evaluate:pairwise
-
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 
-* Node.js 22 or later.
-* npm.
-* A code editor, such as Visual Studio Code.
+- Node.js 22 or later.
+- npm.
+- A code editor, such as Visual Studio Code.
 
-**Note:** You do not need a real OpenAI API key to install dependencies or run the local tests. A valid API key is required only when making a live API request.
+**You do not need an OpenAI API key** to install dependencies, run the automated tests, or use the current evaluation demonstrations.
 
-### 1. Install Dependencies
+### 1. Install dependencies
 
-Clone the repository, navigate to the project directory, and install the dependencies:
+Clone the repository and enter its directory:
 
 ```bash
+git clone https://github.com/virginiamwega2-svg/openai-sdk-docs-practice.git
+cd openai-sdk-docs-practice
 npm ci
 ```
 
-### 2. Configure Your Environment
+### 2. Run the automated tests
+
+```bash
+npm test
+```
+
+The tests cover application behavior, error handling, observability, evaluation logic, judge-output validation, and other project checks. Mocked SDK responses allow these tests to run without live API requests.
+
+### 3. Check documentation links
+
+```bash
+npm run check:docs
+```
+
+This checks local Markdown links and rejects links that escape the project directory.
+
+## Available Commands
+
+| Command | Purpose |
+|---|---|
+| `npm test` | Run the automated test suite |
+| `npm run check:docs` | Check local Markdown links |
+| `npm run test:otel` | Run the mocked OpenTelemetry demonstration |
+| `npm run evaluate` | Evaluate sample summaries using phrase checks |
+| `npm run evaluate:pairwise` | Compare simulated judge preferences against reference judgments |
+
+## Optional: Run a Live API Example
+
+The live examples require a valid OpenAI API key and appropriate API access. They are optional; the local tests and evaluation demonstrations work without one.
+
+### Configure the API key
 
 Create a `.env` file in the project root:
 
@@ -132,93 +74,154 @@ Create a `.env` file in the project root:
 OPENAI_API_KEY=your_api_key_here
 ```
 
-Replace the placeholder with a valid API key only if you intend to make a live API request.
+Replace the placeholder with a valid API key when you have one. Never commit your `.env` file or expose your API key.
 
-**Security:** Never commit your real API key to GitHub. Keep your `.env` file private.
-
-**If you haven't configured an API key:** You can still install dependencies and run the automated tests. Running `npm start` or the live summarization example requires a valid `OPENAI_API_KEY`. Without one, the application displays a missing API key message and exits.
-
-### 3. Run the Tests
-
-Run the automated test suite:
+### Generate a greeting
 
 ```bash
-npm test
-```
-
-The local tests verify missing API key handling and error-message behavior without making live API requests.
-
-
-### 4. Run the Example
-
-The project supports three commands: `greet`, `summarize`, and `stream`.
-
-**Generate a greeting**
-
-```powershell
 node index.js
 ```
 
-**Summarize text**
+### Summarize text
 
-```powershell
+```bash
 node index.js summarize "Developer documentation helps developers use software effectively."
 ```
 
-Both commands make live API requests and require a valid OpenAI API key in your `.env` file, along with the necessary API access and configuration.
+### Stream a response
 
-For input validation examples, see the [QuickStart Guide](./QUICKSTART.md).
+```bash
+node index.js stream "Explain how an API works."
+```
 
-**Note:** Live API requests may incur charges depending on your account and usage. The automated tests use mocks and do not require live API access.
+These commands make live API requests and may incur charges. Without a valid API key, the application displays a missing-key message.
 
+## AI Observability and OpenTelemetry
 
-### 5. Explore the Documentation
+The project records application-level measurements for AI operations.
 
-* [QuickStart Guide](./QUICKSTART.md) — Set up the project and run the example.
-* [API Reference](./API-REFERENCE.md) — Review the exported functions, parameters, return values, validation, and error behaviour.
-* [SDK Integration Guide](./SDK-INTEGRATION-GUIDE.md) — Understand how the OpenAI SDK is integrated and how the example works.
-* [Streaming Cookbook](./STREAMING-COOKBOOK.md) — Learn how to consume streamed text responses and run the streaming example.
-* [Troubleshooting Guide](./TROUBLESHOOTING.md) — Diagnose common issues and learn how to recover.
-* [Validation Report](./VALIDATION-REPORT.md) — Review the checks performed to verify documentation against the implementation.
-* [SDK Documentation Audit](./SDK-DOCUMENTATION-AUDIT.md) — Review documentation quality and opportunities to improve the developer experience.
-* [AI Observability Guide](./AI-OBSERVABILITY-GUIDE.md) — Learn about AI request tracing, latency, token usage, costs, streaming failures, evaluation, and privacy.
+### Operation metrics
 
+The `withObservability()` helper records the operation name, duration, and success or error status.
 
-## Project Limitations
+When usage information is available, the examples also report:
 
-The local tests do not verify live API access, model availability, account permissions, or billing.
+- Input, output, and total token counts.
+- Time to first non-empty text delta for streaming operations.
+- Estimated request cost based on the pricing assumptions configured in the code.
 
-**Passing the local tests does not guarantee that a live API request will succeed.** Live requests depend on valid credentials, API access, model availability, account configuration, and network connectivity.
+Cost estimates are illustrative, not guaranteed invoice totals. They may not account for every pricing adjustment or additional charge.
 
-## Why This Project Exists
+### Run the tracing demonstration
 
-The goal is to make SDK onboarding easier by testing documentation against the actual implementation, anticipating common errors, and helping developers understand how to recover when something goes wrong.
+```bash
+npm run test:otel
+```
 
-This project treats documentation as an essential part of the developer experience: instructions should be clear, examples should be usable, and errors should help developers take the next step.
+This demonstration uses a mocked SDK response and exports an OpenTelemetry span to the console. It does not require a live API request.
+
+The current implementation provides application-level spans. It does not yet provide a persistent observability backend or dashboard, automatic OpenAI SDK HTTP instrumentation, or verified distributed trace-context propagation.
+
+For more detail, see the [AI Observability Guide](./AI-OBSERVABILITY-GUIDE.md).
+
+## LLM Output Evaluation
+
+The project includes a rule-based baseline for evaluating sample summaries against predefined expectations.
+
+### Run the evaluation examples
+
+```bash
+npm run evaluate
+```
+
+The dataset covers three scenarios:
+
+- Preserving events, dates, and planned actions.
+- Respecting conditions and limitations.
+- Avoiding unsupported conclusions about survey results.
+
+Key files:
+
+- `EVALUATION-CRITERIA.md` — intended quality criteria and evaluation limitations.
+- `evaluation-dataset.json` — source texts and required or forbidden phrases.
+- `evaluation-examples.json` — sample summaries.
+- `evaluation.js` — phrase-check evaluation logic.
+- `evaluation-runner.js` — runs the examples and reports scores.
+- `evaluation.test.js` — tests the evaluator.
+
+### Understanding the scores
+
+The evaluator checks whether configured phrases are present or absent and calculates a phrase-check score.
+
+This is a **rule-based baseline, not a comprehensive AI quality score**. It can reject a valid paraphrase or miss a misleading statement expressed in different words. The sample summaries are hand-written, not outputs from a live model.
+
+## Pairwise LLM Evaluation
+
+The project includes an experimental workflow for comparing two candidate summaries against reference judgments.
+
+### Run the pairwise benchmark
+
+```bash
+npm run evaluate:pairwise
+```
+
+The benchmark contains three comparison cases covering factual faithfulness, preservation of conditions, and appropriate handling of uncertainty.
+
+Key files:
+
+- `evaluation-comparisons.json` — candidate summaries, reference preferences, criteria, and rationales.
+- `PAIRWISE-JUDGE-PROMPT.md` — proposed instructions for a future LLM judge.
+- `pairwise-judge-output.js` — validates the expected judge-output structure.
+- `pairwise-judge-output.test.js` — tests output validation.
+- `pairwise-evaluation.js` — scores preferences and calculates agreement.
+- `pairwise-evaluation.test.js` — tests pairwise scoring and missing-result detection.
+- `pairwise-evaluation-runner.js` — runs the benchmark and reports disagreements.
+- `pairwise-judge-results.json` — simulated structured judge results.
+- `pairwise-predictions.json` — simulated preference predictions.
+
+### Understanding the benchmark
+
+The current benchmark uses **simulated judge results**, not judgments generated by a live AI model.
+
+The reported agreement rate measures whether the supplied predictions match the reference labels. The current 67% result demonstrates the scoring pipeline; it is not a validated AI judge accuracy score.
+
+The judge prompt and structured-output contract have not yet been validated against real model judgments. The benchmark does not currently make model-based quality judgments.
+
+## Documentation
+
+| Guide | Purpose |
+|---|---|
+| [QuickStart Guide](./QUICKSTART.md) | Set up the project and run examples |
+| [API Reference](./API-REFERENCE.md) | Understand functions, parameters, and errors |
+| [SDK Integration Guide](./SDK-INTEGRATION-GUIDE.md) | Explore the SDK integration |
+| [Streaming Cookbook](./STREAMING-COOKBOOK.md) | Learn about streaming responses |
+| [Troubleshooting Guide](./TROUBLESHOOTING.md) | Diagnose common integration problems |
+| [Validation Report](./VALIDATION-REPORT.md) | Review documentation validation |
+| [SDK Documentation Audit](./SDK-DOCUMENTATION-AUDIT.md) | Review documentation quality |
+| [AI Observability Guide](./AI-OBSERVABILITY-GUIDE.md) | Understand metrics and tracing |
+| [Evaluation Criteria](./EVALUATION-CRITERIA.md) | Review evaluation goals and limitations |
+| [Pairwise Judge Prompt](./PAIRWISE-JUDGE-PROMPT.md) | Review the proposed judge instructions |
+
+## Security and Limitations
+
+- Never commit API keys, credentials, or private environment files.
+- Live API requests require valid credentials and appropriate API access.
+- Live API usage may incur charges.
+- Mocked tests do not verify live model behavior, availability, performance, or actual billing.
+- Phrase-check scores do not establish that a summary is correct.
+- Simulated pairwise results do not establish that an AI judge is reliable.
+
+Documented concepts should not be interpreted as implemented capabilities unless supported by code, configuration, and tests.
 
 ## Continuous Integration
 
-This project uses GitHub Actions to verify code behavior and documentation quality whenever changes are pushed to the repository or a pull request is opened.
+The GitHub Actions workflow in `.github/workflows/tests.yml` runs the automated tests and documentation-link checks.
 
-The workflow performs two checks:
-
-- **Automated tests:** Runs `npm test` to verify application behavior and catch regressions.
-- **Documentation link check:** Runs `npm run check:docs` to identify broken local Markdown links and links that point outside the project directory.
-
-### Run the checks locally
-
-Run the automated tests:
+Run both locally before submitting changes:
 
 ```bash
 npm test
-```
-
-Check local documentation links:
-
-```bash
 npm run check:docs
 ```
 
-Both checks should pass before changes are pushed.
-
-**Workflow:** `.github/workflows/tests.yml`
+The aim of this project is to make AI integrations easier for developers to use and understand through working examples, testable behavior, accurate documentation, and transparent evaluation limitations.
