@@ -197,7 +197,7 @@ Setting `process.exitCode = 1` indicates failure to the operating system without
 The complete practice project includes:
 
 * **`error-handler.js`** — Exports `getErrorMessage` and handles the error categories covered by the tests.
-* **`index.test.js`** — Contains 12 local tests covering CLI validation, SDK error handling, mocked successful responses, and summarization input validation.
+ * **`index.test.js`** — Contains tests covering CLI validation, SDK error handling, mocked successful responses, and summarization input validation.
 
 
 When building from scratch, create these files as well. The example will not run correctly without its imported error handler.
@@ -281,41 +281,39 @@ A successful live API request has **not yet been verified** in this project. Liv
 
 Live API requests may incur charges. Check your API access and applicable pricing before making one.
 
-
 ## 7. Run the Automated Tests
 
-Run the local test suite:
+Run the project's automated test suite from the repository root:
 
 ```bash
 npm test
 ```
-The **26 automated tests** cover:
+
+The suite uses Node.js's built-in test runner and does not require a live OpenAI API key.
+
+The tests cover:
 
 - CLI validation and helpful error messages.
 - SDK error handling for authentication, permissions, rate limits, connection failures, and unexpected errors.
-- Mocked successful greeting and summarization requests.
-- Summarization input validation.
-- Streaming behavior, including text fragments, ignored non-text events, invalid inputs, and error propagation.
-- Observability metrics, including handling failures in the metrics callback.
-- Documentation link validation, including valid links, missing targets, and links that escape the project directory.
+- Mocked successful greeting and summarization responses.
+- Summarization and streaming input validation.
+- Streaming behavior, including text fragments, ignored non-text events, and error propagation.
+- Observability metrics, error recording, and OpenTelemetry span attributes.
+- Rule-based evaluation using required and forbidden phrase checks.
+- Pairwise evaluation scoring, agreement summaries, and missing-result detection.
+- Structured judge-output validation, including invalid JSON, unsupported values, and missing or unexpected fields.
+- Pairwise judge-client prompt rendering and mocked SDK responses.
+- Live-evaluation runner behavior using mocked judgments.
+- Documentation-link checker behavior, including valid local links, missing targets, and links that escape the project directory.
 
-The tests run locally without making live API requests.
+A successful run should finish with zero failed tests. The total test count may change as the project evolves, so use the summary printed by your local test run rather than relying on a fixed number in this guide.
 
-A successful run should report results equivalent to:
+**Verification boundary:** Mocked tests provide evidence for the application behavior they exercise. They do not prove that a live API request succeeds, that an AI judge is reliable, or that the application is production-ready.
 
-```text
-ℹ tests 26
-ℹ pass 26
-ℹ fail 0
-```
-
-The exact output format may vary by Node.js version.
-
-**Verified locally:** All 26 tests passed in the latest recorded test run. This confirms the tested local behavior, not the success of a live API request.
-
-The successful-response test uses a mock client that returns a response-shaped object. It verifies how `generateGreeting()` handles that object; it does not verify the live OpenAI SDK, network connectivity, or model access.
+The live pairwise evaluation command may incur API charges. It is not required for this local test suite.
 
 If a test fails, read the failure message and compare the actual behavior with the expected result before changing the implementation.
+
 
 ## 8. Troubleshooting
 
@@ -394,7 +392,7 @@ You have completed the local setup and verification when you can:
 * Configure an API key without exposing it.
 * Run the example and understand its missing-key behavior.
 * Explain the difference between a local validation check, a mocked response, and a live API request.
-* Run all 26 automated tests successfully.
+* Run the complete automated test suite successfully, with zero failed tests.
 * Find guidance for common errors and understand the next troubleshooting step.
 
 A successful live API request additionally requires valid credentials, suitable permissions, access to the configured model, and working network connectivity. Live API success has not been verified as part of this practice project.
