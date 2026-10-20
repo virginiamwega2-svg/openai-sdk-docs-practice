@@ -187,6 +187,31 @@ The reported agreement rate measures whether the supplied predictions match the 
 
 The judge prompt and structured-output contract have not yet been validated against real model judgments. The benchmark does not currently make model-based quality judgments.
 
+
+### Optional: Run a Live Pairwise Evaluation
+
+The project includes an optional runner that uses the OpenAI Responses API to compare candidate summaries against the original source text and evaluation criteria.
+
+The live runner requires a valid OpenAI API key with access to the configured model.
+
+Set `OPENAI_API_KEY` in your local `.env` file, which must never be committed. You can optionally set `OPENAI_JUDGE_MODEL` to select a different supported model. The default is `gpt-5.5`.
+
+Run the live evaluation with:
+
+```bash
+npm run evaluate:pairwise:live
+```
+
+The runner evaluates each comparison, validates the structured judge output, and reports agreement with the reference preferences.
+
+**Cost and limitations:**
+- Each comparison makes a live model request. The current dataset contains three comparisons, so a full run can make three requests.
+- API usage may incur charges. Confirm your model access and pricing before running the command.
+- Model judgments can be incorrect. Agreement with reference preferences does not establish that the judge is reliable.
+- The existing `npm run evaluate:pairwise` command continues to use simulated results and does not require an API key.
+- Automated tests use mocked responses and do not make live API requests.
+
+
 ## Documentation
 
 | Guide | Purpose |
