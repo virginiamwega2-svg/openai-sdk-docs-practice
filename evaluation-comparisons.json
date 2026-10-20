@@ -1,0 +1,41 @@
+[
+  {
+    "id": "launch-delay-comparison",
+    "sourceCaseId": "launch-delay",
+    "responseA": "The launch was postponed from May 10 to May 17 after engineers discovered a login issue. The issue was fixed on May 14, and another regression test is planned for May 15 before the release is confirmed.",
+    "responseB": "The application launched successfully on May 10. Engineers confirmed that all bugs were fixed, so no further testing is necessary.",
+    "preferredResponse": "A",
+    "criteria": [
+      "faithfulness",
+      "key-information-coverage",
+      "avoid-unsupported-claims"
+    ],
+    "rationale": "Response A preserves the postponement, repair date, and planned test. Response B invents a successful launch and claims no further testing is needed."
+  },
+  {
+    "id": "library-hours-comparison",
+    "sourceCaseId": "library-hours",
+    "responseA": "Starting June 3, Riverside Public Library will close at 8 p.m. on Tuesdays and Thursdays during an eight-week pilot. Visitor counts and staff feedback will inform whether the change continues; Sunday hours will remain unchanged.",
+    "responseB": "Riverside Public Library is permanently extending its opening hours to 8 p.m. every day because visitors requested it.",
+    "preferredResponse": "A",
+    "criteria": [
+      "faithfulness",
+      "preservation-of-conditions",
+      "key-information-coverage"
+    ],
+    "rationale": "Response A preserves the start date, pilot duration, applicable days, and decision process. Response B incorrectly claims the change is permanent, applies every day, and was requested by visitors."
+  },
+  {
+    "id": "survey-evidence-comparison",
+    "sourceCaseId": "onboarding-survey",
+    "responseA": "A voluntary survey of 120 users found that 72 considered the documentation easy to follow, 30 were neutral, and 18 found it difficult. Easier-to-follow documentation was associated with higher onboarding ratings, but the survey cannot establish causation or represent all users.",
+    "responseB": "A survey proved that better documentation causes successful onboarding for all users. It also confirmed that users completed tasks faster.",
+    "preferredResponse": "A",
+    "criteria": [
+      "faithfulness",
+      "preservation-of-uncertainty",
+      "avoid-unsupported-claims"
+    ],
+    "rationale": "Response A preserves the survey results and their limitations. Response B invents causation, generalizes to all users, and claims a task-completion measurement that was never performed."
+  }
+]

@@ -96,6 +96,16 @@ Run the evaluation runner:
 ```bash
 npm run evaluate
 
+## Pairwise LLM Evaluation
+
+This project includes a prototype workflow for comparing two
+candidate summaries against a human reference judgment.
+
+### Run the Pairwise Benchmark
+
+```bash
+npm run evaluate:pairwise
+
 ## Getting Started
 
 ### Prerequisites

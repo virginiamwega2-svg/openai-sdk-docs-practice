@@ -8,7 +8,8 @@
   "test": "node --test",
   "check:docs": "node scripts/check-doc-links.js",
   "test:otel": "node --import ./instrumentation.js ./otel-smoke.js",
-  "evaluate": "node evaluation-runner.js"
+  "evaluate": "node evaluation-runner.js",
+  "evaluate:pairwise": "node pairwise-evaluation-runner.js"
 },
   "keywords": [],
   "author": "",

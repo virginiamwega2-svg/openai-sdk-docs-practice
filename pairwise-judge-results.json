@@ -1,0 +1,32 @@
+[
+  {
+    "comparisonId": "launch-delay-comparison",
+    "judgeOutput": {
+      "preference": "A",
+      "responseAEvaluation": "Response A preserves the postponement, repair date, and planned regression test.",
+      "responseBEvaluation": "Response B incorrectly claims the application launched and that no further testing is needed.",
+      "rationale": "Response A is better supported by the source and avoids unsupported claims.",
+      "confidence": "high"
+    }
+  },
+  {
+    "comparisonId": "library-hours-comparison",
+    "judgeOutput": {
+      "preference": "A",
+      "responseAEvaluation": "Response A preserves the start date, pilot duration, applicable days, and decision process.",
+      "responseBEvaluation": "Response B incorrectly claims the extended hours are permanent and apply every day.",
+      "rationale": "Response A preserves the source's conditions and limitations.",
+      "confidence": "high"
+    }
+  },
+  {
+    "comparisonId": "survey-evidence-comparison",
+    "judgeOutput": {
+      "preference": "B",
+      "responseAEvaluation": "Response A preserves the survey results and the limitation on causal conclusions.",
+      "responseBEvaluation": "Response B gives a more decisive conclusion about onboarding outcomes.",
+      "rationale": "This deliberately flawed judgment overvalues decisiveness despite the unsupported claims in Response B.",
+      "confidence": "medium"
+    }
+  }
+]
