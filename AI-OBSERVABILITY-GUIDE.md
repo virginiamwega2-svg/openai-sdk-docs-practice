@@ -342,6 +342,22 @@ Recommended practices include:
 
 Removing secrets and unnecessary sensitive information reduces the risk of exposing private data during troubleshooting.
 
+#### Exception Data Handling in This Project
+
+The `withObservability()` wrapper records a generic `exception` event for
+caught values that are instances of `Error`, using the fixed attribute
+`"exception.type": "Error"` instead of exporting the original exception
+message or stack trace through the span event. It still marks the span
+as failed and rethrows the original error to the caller.
+
+The regression test in `observability-tracing.test.js` verifies that
+a sensitive marker in an exception message does not appear in the
+exported span attributes or events.
+
+This is a targeted safeguard, not general-purpose automatic redaction.
+Other logging paths, SDK instrumentation, callbacks, or exporters may
+still expose sensitive data and must be reviewed separately.
+
 ### Understanding Sampling
 
 Sampling is the practice of recording only a subset of requests for observability.
