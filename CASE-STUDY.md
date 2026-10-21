@@ -202,6 +202,19 @@ The project has a repeatable local verification workflow covering application be
 | Pairwise evaluation | Three simulated judgments produced two agreements and one disagreement | The scoring workflow identifies agreement and disagreement with reference preferences. |
 | Live-evaluation orchestration | Mocked tests verify source-text mapping and judge-output validation | The runner's tested workflow operates without live API requests. |
 
+### Independent Onboarding and Node.js Compatibility Validation
+
+I cloned the public repository into a clean temporary directory and repeated the setup and verification workflow on Windows PowerShell.
+
+- **Clean installation:** `npm ci` completed successfully, with zero vulnerabilities reported by npm.
+- **Runtime compatibility:** All 57 tests passed on Node.js 22.23.0 and Node.js 25.8.0.
+- **Documentation validation:** The link checker passed, scanning 13 Markdown files.
+- **Observability smoke test:** The mocked OpenTelemetry demonstration completed successfully on both Node.js versions.
+
+This exercise also exposed a Windows-specific command invocation issue with module paths. Correcting the path syntax allowed the Node.js 22 smoke test to pass.
+
+These results validate the specific workflows tested in this environment. They do not establish compatibility with every environment, independent-user usability, or successful live API requests.
+
 The results provide repeatable evidence for the behaviors covered by the local tests. They do not establish production readiness, independent onboarding improvements, or the reliability of live AI judgments.
 
 ## Limitations and Outstanding Work
