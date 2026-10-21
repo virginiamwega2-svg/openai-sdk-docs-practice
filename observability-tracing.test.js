@@ -149,3 +149,44 @@ test("records success status and duration without changing the operation result"
   assert.ok(Number.isFinite(recordedMetric.durationMs));
   assert.ok(recordedMetric.durationMs >= 0);
 });
+test("does not export sensitive error content in tracing telemetry", async () => {
+  exporter.reset();
+
+  const sensitiveMarker = "PRIVATE_PROMPT_DO_NOT_LOG";
+  const expectedError = new Error(
+    `Provider failure; prompt=${sensitiveMarker}`
+  );
+
+  await assert.rejects(
+    withObservability(
+      "test.privacy-safe-error",
+      async () => {
+        throw expectedError;
+      },
+      () => {}
+    ),
+    (error) => error === expectedError
+  );
+
+  await provider.forceFlush();
+
+  const span = exporter
+    .getFinishedSpans()
+    .find((item) => item.name === "test.privacy-safe-error");
+
+  assert.ok(span, "Expected a span for the failed operation");
+
+  const exportedTelemetry = JSON.stringify({
+    attributes: span.attributes,
+    events: span.events.map(({ name, attributes }) => ({
+      name,
+      attributes,
+    })),
+  });
+
+  assert.equal(
+    exportedTelemetry.includes(sensitiveMarker),
+    false,
+    "Sensitive error content must not appear in exported telemetry"
+  );
+});

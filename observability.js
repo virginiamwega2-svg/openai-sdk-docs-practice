@@ -23,9 +23,11 @@ export async function withObservability(
     status = "error";
 
     if (error instanceof Error) {
-      span.recordException(error);
+      // Record a generic exception event without exporting the message or stack.
+      span.addEvent("exception", {
+        "exception.type": "Error",
+      });
     }
-
     span.setStatus({ code: SpanStatusCode.ERROR });
 
     throw error;
