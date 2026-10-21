@@ -119,3 +119,33 @@ test("records error status and an exception on a failed span", async () => {
     "Expected the span to contain an exception event"
   );
 });
+test("records success status and duration without changing the operation result", async () => {
+  exporter.reset();
+
+  let recordedMetric;
+
+  const result = await withObservability(
+    "test.successful-operation",
+    async () => "operation result",
+    (measurement) => {
+      recordedMetric = measurement;
+    }
+  );
+
+  await provider.forceFlush();
+
+  const span = exporter
+    .getFinishedSpans()
+    .find((item) => item.name === "test.successful-operation");
+
+  assert.equal(result, "operation result");
+
+  assert.ok(span, "Expected a span for the successful operation");
+  assert.equal(span.attributes["app.operation.status"], "success");
+
+  assert.ok(recordedMetric, "Expected a recorded metric");
+  assert.equal(recordedMetric.operation, "test.successful-operation");
+  assert.equal(recordedMetric.status, "success");
+  assert.ok(Number.isFinite(recordedMetric.durationMs));
+  assert.ok(recordedMetric.durationMs >= 0);
+});
