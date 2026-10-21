@@ -68,7 +68,7 @@ I used Node.js's built-in test runner to verify application behavior, error hand
 
 The latest verified local test run completed with:
 
-- **55 tests passed**
+- **57 tests passed**
 - **0 tests failed**
 - **0 tests skipped or cancelled**
 
@@ -96,7 +96,19 @@ The project includes an observability helper that records operation duration and
 
 Where usage information is available, the examples also capture token-usage measurements and estimated request cost. Streaming instrumentation records time to first non-empty text output.
 
-An OpenTelemetry demonstration attaches relevant measurements and error information to application-level spans and exports a mocked trace to the console.
+An OpenTelemetry demonstration attaches relevant measurements to
+application-level spans and exports a mocked trace to the console.
+
+For caught values that are instances of `Error`, the wrapper records
+a generic exception event with the fixed attribute
+`"exception.type": "Error"` instead of exporting the original exception
+message or stack trace through that event. It still marks the span as
+failed and rethrows the original error to the caller.
+
+A regression test verifies that a synthetic sensitive marker does not
+appear in the exported span attributes or events. This is a targeted
+safeguard, not general-purpose automatic redaction; other logging paths
+and exporters must be reviewed separately.
 
 Run the demonstration with:
 
@@ -181,7 +193,8 @@ The project has a repeatable local verification workflow covering application be
 
 | Area | Verified evidence | What it demonstrates |
 |---|---|---|
-| Automated testing | 55 tests passed and 0 failed in the latest recorded run | The behaviors covered by the test suite passed. |
+| Automated testing | 57 tests passed and 0 failed in the latest recorded run | The behaviors covered by the test suite passed. |
+| Continuous integration | GitHub Actions passed the automated tests, OpenTelemetry smoke test, and documentation-link check on the pushed commit | Confirms these checks passed in CI; it does not prove live API behavior or production readiness. |
 | Documentation links | `npm run check:docs` passed and scanned 13 Markdown files | The checked local Markdown links passed validation. |
 | Error handling | Tests cover missing credentials, authentication, permissions, rate limits, connection failures, and unexpected errors | The tested failure paths produce the expected application behavior. |
 | Observability | Tests cover operation status, duration, usage attributes, estimated cost, and error recording | The instrumentation records the measurements exercised by the tests. |
@@ -241,7 +254,7 @@ This project brought together AI SDK integration, developer documentation, autom
 
 I built developer-facing examples, added input validation and actionable error handling, instrumented operations, created rule-based and pairwise evaluation workflows, and implemented an optional live-evaluation path with structured-output validation.
 
-The latest verified test run passed all 55 tests, and the documentation-link checker passed while scanning 13 Markdown files. These checks provide repeatable evidence for the behaviors covered by the tests. They do not prove that live AI judgments are reliable or that independent developer onboarding has improved.
+The latest verified test run passed all 57 tests, and the documentation-link checker passed while scanning 13 Markdown files. These checks provide repeatable evidence for the behaviors covered by the tests. They do not prove that live AI judgments are reliable or that independent developer onboarding has improved.
 
 The project reinforced an important principle: good developer experience requires more than working code. Developers need clear instructions, useful errors, testable behavior, observable operations, practical troubleshooting guidance, and transparent explanations of limitations.
 
