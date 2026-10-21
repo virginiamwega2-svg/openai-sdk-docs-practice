@@ -120,6 +120,13 @@ npm run test:otel
 
 This demonstration uses a mocked SDK response and exports an OpenTelemetry span to the console. It does not require a live API request.
 
+For caught values that are instances of `Error`, the observability wrapper
+records a generic exception event instead of exporting the original exception
+message or stack trace through that event. A regression test verifies that
+sensitive error content is absent from exported span attributes and events.
+This is a targeted safeguard, not general-purpose automatic redaction; other
+logging paths and exporters must still be reviewed.
+
 The current implementation provides application-level spans. It does not yet provide a persistent observability backend or dashboard, automatic OpenAI SDK HTTP instrumentation, or verified distributed trace-context propagation.
 
 For more detail, see the [AI Observability Guide](./AI-OBSERVABILITY-GUIDE.md).
