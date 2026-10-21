@@ -24,5 +24,8 @@ jobs:
       - name: Run automated tests
         run: npm test
 
+      - name: Verify OpenTelemetry instrumentation
+        run: npm run test:otel
+
       - name: Check documentation links
         run: npm run check:docs
