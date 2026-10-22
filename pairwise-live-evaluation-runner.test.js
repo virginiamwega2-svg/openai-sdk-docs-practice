@@ -94,3 +94,22 @@ test("rejects an empty comparison dataset", async () => {
     /At least one comparison is required/,
   );
 });
+
+
+test("propagates judge failures without returning a partial summary", async () => {
+  await assert.rejects(
+    () =>
+      runPairwiseLiveEvaluation({
+        comparisons,
+        dataset,
+        judge: async () => {
+          throw new Error("Judge request failed");
+        },
+        log: () => {},
+      }),
+    {
+      name: "Error",
+      message: "Judge request failed",
+    }
+  );
+});
