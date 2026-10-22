@@ -86,6 +86,23 @@ test("rejects an empty rationale", () => {
   );
 });
 
+test("rejects empty candidate evaluations", () => {
+  for (const field of [
+    "responseAEvaluation",
+    "responseBEvaluation",
+  ]) {
+    const output = { ...validOutput, [field]: "   " };
+
+    assert.throws(
+      () => parseJudgeOutput(JSON.stringify(output)),
+      {
+        name: "TypeError",
+        message: `${field} must be a non-empty string.`,
+      }
+    );
+  }
+});
+
 test("rejects non-string input", () => {
   assert.throws(
     () => parseJudgeOutput({ ...validOutput }),
