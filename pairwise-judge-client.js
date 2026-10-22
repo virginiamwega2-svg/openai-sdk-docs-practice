@@ -68,7 +68,9 @@ function validateInput(input) {
 
 export function renderPairwiseJudgePrompt(template, input) {
   if (typeof template !== "string" || !template.trim()) {
-    throw new TypeError("Prompt template must be a non-empty string.");
+    throw new TypeError(
+      "Prompt template must be a non-empty string.",
+    );
   }
 
   validateInput(input);
@@ -100,6 +102,7 @@ export function createPairwiseJudge({
   client,
   model = process.env.OPENAI_JUDGE_MODEL || DEFAULT_MODEL,
   promptTemplate,
+  clientFactory = (options) => new OpenAI(options),
 } = {}) {
   if (typeof model !== "string" || !model.trim()) {
     throw new TypeError("Model must be a non-empty string.");
@@ -125,8 +128,10 @@ export function createPairwiseJudge({
         );
       }
 
-      activeClient = new OpenAI({
+      activeClient = clientFactory({
         apiKey: process.env.OPENAI_API_KEY,
+        timeout: 30_000,
+        maxRetries: 0,
       });
     }
 

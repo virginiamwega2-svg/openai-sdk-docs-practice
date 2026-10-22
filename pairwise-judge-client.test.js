@@ -101,8 +101,47 @@ test("rejects an invalid judge result", async () => {
     promptTemplate: template,
   });
 
-  await assert.rejects(
+    await assert.rejects(
     () => judge(input),
     /exactly the five required fields/,
   );
+});
+
+test("configures the live client with a 30-second timeout and no retries", async () => {
+  const mock = createMockClient(JSON.stringify(validOutput));
+  const originalApiKey = process.env.OPENAI_API_KEY;
+  const originalModel = process.env.OPENAI_JUDGE_MODEL;
+
+  let capturedOptions;
+
+  process.env.OPENAI_API_KEY = "test-key";
+
+  try {
+    const judge = createPairwiseJudge({
+      model: "test-model",
+      promptTemplate: template,
+      clientFactory: (options) => {
+        capturedOptions = options;
+        return mock.client;
+      },
+    });
+
+    await judge(input);
+
+    assert.equal(capturedOptions.timeout, 30_000);
+    assert.equal(capturedOptions.maxRetries, 0);
+    assert.equal(mock.requests.length, 1);
+  } finally {
+    if (originalApiKey === undefined) {
+      delete process.env.OPENAI_API_KEY;
+    } else {
+      process.env.OPENAI_API_KEY = originalApiKey;
+    }
+
+    if (originalModel === undefined) {
+      delete process.env.OPENAI_JUDGE_MODEL;
+    } else {
+      process.env.OPENAI_JUDGE_MODEL = originalModel;
+    }
+  }
 });
