@@ -6,7 +6,7 @@ How can we make an AI SDK integration easier for developers to set up, understan
 
 I explored this question by building a Node.js application using the OpenAI JavaScript SDK and improving the experience around the integration. The project combines working examples, input validation, actionable error messages, automated tests, observability, evaluation workflows, and practical technical documentation.
 
-I also reviewed the setup and usage flow from a first-time developer's perspective. This was a self-review, not an independent usability study.
+I reviewed the setup and usage flow from a first-time developer's perspective and obtained an independent validation: another developer followed the repository's written instructions themselves and successfully completed onboarding. This provides practical usability evidence, although it was not a formal usability study.
 
 **Project repository:** [openai-sdk-docs-practice](https://github.com/virginiamwega2-svg/openai-sdk-docs-practice)
 
@@ -68,7 +68,7 @@ I used Node.js's built-in test runner to verify application behavior, error hand
 
 The latest verified local test run completed with:
 
-- **57 tests passed**
+- **60 tests passed**
 - **0 tests failed**
 - **0 tests skipped or cancelled**
 
@@ -193,7 +193,7 @@ The project has a repeatable local verification workflow covering application be
 
 | Area | Verified evidence | What it demonstrates |
 |---|---|---|
-| Automated testing | 57 tests passed and 0 failed in the latest recorded run | The behaviors covered by the test suite passed. |
+| Automated testing | 60 tests passed and 0 failed in the latest recorded local run | The behaviors covered by the test suite passed locally. |
 | Continuous integration | GitHub Actions passed the automated tests, OpenTelemetry smoke test, and documentation-link check on the pushed commit | Confirms these checks passed in CI; it does not prove live API behavior or production readiness. |
 | Documentation links | `npm run check:docs` passed and scanned 13 Markdown files | The checked local Markdown links passed validation. |
 | Error handling | Tests cover missing credentials, authentication, permissions, rate limits, connection failures, and unexpected errors | The tested failure paths produce the expected application behavior. |
@@ -213,9 +213,9 @@ I cloned the public repository into a clean temporary directory and repeated the
 
 This exercise also exposed a Windows-specific command invocation issue with module paths. Correcting the path syntax allowed the Node.js 22 smoke test to pass.
 
-These results validate the specific workflows tested in this environment. They do not establish compatibility with every environment, independent-user usability, or successful live API requests.
+These results validate the specific workflows tested in this environment. The separate independent onboarding exercise provides evidence that another developer could follow the written instructions and complete onboarding. It does not establish compatibility with every environment, a measured onboarding-time improvement, or successful live API requests.
 
-The results provide repeatable evidence for the behaviors covered by the local tests. They do not establish production readiness, independent onboarding improvements, or the reliability of live AI judgments.
+The results provide repeatable evidence for the behaviors covered by the local tests. They do not establish production readiness, improvements in onboarding time or usability across different developers, or the reliability of live AI judgments.
 
 ## Limitations and Outstanding Work
 
@@ -227,13 +227,13 @@ The project demonstrates practical engineering and documentation workflows, but 
 
 - **Rule-based evaluation:** Phrase matching can reject valid paraphrases or miss unsupported claims expressed in different words. Its scores are not comprehensive measures of summary quality.
 
-- **Independent usability:** A developer unfamiliar with the repository has not independently completed the QuickStart. There is no measured onboarding-time improvement or independent usability study.
+- **Independent usability:** One developer independently followed the repository's written instructions and successfully completed onboarding. This is encouraging usability evidence, but it is not a formal usability study. Onboarding time, assistance requirements across different users, and the frequency of setup difficulties have not been measured.
 
 - **Documentation coverage:** The automated checker validates local Markdown links and rejects paths that escape the project directory. It does not establish that every external link works or that every rendered page is clear and accurate.
 
 - **Production readiness:** The local test suite verifies only the behaviors it covers. Real API availability, live judge behavior, production performance, and actual billing have not been validated through a live evaluation.
 
-These are concrete validation opportunities rather than reasons to overstate the current results. The next useful steps are to run a controlled live evaluation when appropriate, compare its judgments against reviewed human references, and ask an independent developer to follow the QuickStart and report any obstacles.
+These are concrete validation opportunities rather than reasons to overstate the current results. The next useful steps are to run a controlled live evaluation when appropriate, compare its judgments against reviewed human references, and gather more independent onboarding feedback across different environments.
 
 ## Key Lessons
 
@@ -267,7 +267,7 @@ This project brought together AI SDK integration, developer documentation, autom
 
 I built developer-facing examples, added input validation and actionable error handling, instrumented operations, created rule-based and pairwise evaluation workflows, and implemented an optional live-evaluation path with structured-output validation.
 
-The latest verified test run passed all 57 tests, and the documentation-link checker passed while scanning 13 Markdown files. These checks provide repeatable evidence for the behaviors covered by the tests. They do not prove that live AI judgments are reliable or that independent developer onboarding has improved.
+The latest recorded local test run passed all 60 tests, and the documentation-link checker passed while scanning 13 Markdown files. These checks provide repeatable evidence for the behaviors covered by the tests. They do not prove that live AI judgments are reliable or that onboarding time or usability has improved across different developers.
 
 The project reinforced an important principle: good developer experience requires more than working code. Developers need clear instructions, useful errors, testable behavior, observable operations, practical troubleshooting guidance, and transparent explanations of limitations.
 
