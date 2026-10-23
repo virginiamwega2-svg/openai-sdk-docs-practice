@@ -207,7 +207,7 @@ The project has a repeatable local verification workflow covering application be
 I cloned the public repository into a clean temporary directory and repeated the setup and verification workflow on Windows PowerShell.
 
 - **Clean installation:** `npm ci` completed successfully, with zero vulnerabilities reported by npm.
-- **Runtime compatibility:** All 57 tests passed on Node.js 22.23.0 and Node.js 25.8.0.
+- **Historical runtime compatibility check:** At the time of the clean-clone validation, all 57 tests passed on Node.js 22.23.0 and Node.js 25.8.0.
 - **Documentation validation:** The link checker passed, scanning 13 Markdown files.
 - **Observability smoke test:** The mocked OpenTelemetry demonstration completed successfully on both Node.js versions.
 
