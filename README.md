@@ -68,13 +68,14 @@ The live examples require a valid OpenAI API key and appropriate API access. The
 
 ### Configure the API key
 
-Create a `.env` file in the project root:
+Copy the example environment file to create `.env` in the project root:
 
-```env
-OPENAI_API_KEY=your_api_key_here
+```powershell
+Copy-Item .env.example .env
 ```
 
-Replace the placeholder with a valid API key when you have one. Never commit your `.env` file or expose your API key.
+Open `.env` and replace the empty `OPENAI_API_KEY` value with your valid API key. Never commit your `.env` file or expose your API key.
+
 
 ### Generate a greeting
 
