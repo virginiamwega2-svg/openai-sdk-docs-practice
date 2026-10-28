@@ -187,6 +187,20 @@ This path requires a valid OpenAI API key and model access. Live requests may in
 
 The new client and runner have been tested with mocked responses. **The live-evaluation workflow has not yet been verified against actual model judgments.** Its implementation and mocked tests should not be presented as proof of live model accuracy or reliability.
 
+## Before-and-After Comparison
+
+This comparison summarizes the developer-experience problems the project set out to address and the work completed. It is a qualitative comparison, not a controlled before-and-after usability study.
+
+| Area | Before: problem to address | After: implemented change | Evidence and remaining limits |
+|---|---|---|---|
+| Setup and onboarding | Developers may struggle with configuration, unfamiliar commands, or unclear recovery steps. | Added setup guidance, a QuickStart, troubleshooting documentation, and actionable configuration errors. | One independent developer completed onboarding without getting stuck. Onboarding time and results across multiple developers have not been measured. |
+| Error handling and verification | A working example alone does not show how an integration behaves when input or configuration is invalid or a request fails. | Added input validation, clearer error handling, automated tests, and CI checks. | Tests cover specific application behaviors, including mocked SDK responses. They do not prove that live API requests succeed or cover every failure scenario. |
+| Observability | Application behavior can be difficult to inspect when failures and usage measurements are not exposed clearly. | Added application-level OpenTelemetry tracing and selected measurements such as operation duration, status, token usage, and estimated cost. | Automated tests and a mocked smoke test verify the implemented paths. This is not a persistent observability backend or dashboard, and the cost figures are estimates. |
+| AI-output evaluation | Example outputs are difficult to compare consistently without explicit criteria and reference preferences. | Added rule-based evaluation, a small pairwise benchmark, structured-output validation, and a separate optional live-evaluation runner. | The simulated benchmark contains three comparisons, with two agreements and one disagreement. This does not establish live AI-judge accuracy; live judgments remain unverified. |
+| Documentation confidence | Documentation claims can be misleading if verification results and untested behavior are not distinguished. | Added practical guides, a local Markdown-link checker, CI validation, and explicit descriptions of test coverage and limitations. | The link checker validates local Markdown links; it does not prove every external link or every instruction is correct in every environment. |
+
+The evidence shows which developer-experience safeguards were implemented and which workflows were verified. It does not establish a measured improvement in onboarding speed, usability across different developers, or production reliability.
+
 ## Verification and Results
 
 The project has a repeatable local verification workflow covering application behavior, documentation consistency, observability, and evaluation logic.
