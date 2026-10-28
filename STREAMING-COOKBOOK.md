@@ -104,11 +104,11 @@ Confirm that the request uses `stream: true` and that the application processes 
 
 ## Verification status
 
-The latest local test run reported 26 passing tests and zero failures.
+At the time of the recorded local test run, 26 tests passed and zero failed.
 
 - The streaming function is implemented in `index.js`.
 - The CLI includes a `stream` command.
-- The automated test suite passed all 26 tests.
+- The recorded automated test run passed all 26 tests.
 - Streaming behavior was tested with mocked events.
 - A live API streaming request has not yet been verified.
 
